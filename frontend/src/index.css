@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    color: #09090B;
+    font-family: 'Inter', sans-serif;
+  }
+
+  html.dark, html.dark body {
+    background-color: #09090B;
+    color: #FAFAFA;
+  }
+
+  /* Custom Typography Classes matching design tokens */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .font-display-hero {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+  }
+
+  .font-headline-lg {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+  }
+
+  .font-headline-md {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+  }
+
+  .font-headline-sm {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+  }
+
+  .font-label-caps {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  .font-spec-code {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .font-price-lg {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D4D4D8;
+  border-radius: 3px;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #27272A;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-invoice, #printable-invoice * {
+    visibility: visible;
+  }
+  #printable-invoice {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white !important;
+    color: black !important;
+  }
+}

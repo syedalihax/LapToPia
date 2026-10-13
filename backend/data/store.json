@@ -1,0 +1,173 @@
+{
+  "products": [],
+  "categories": [
+    {
+      "id": "cat-1",
+      "name": "High-Performance Laptops",
+      "slug": "laptops",
+      "icon": "laptop_chromebook",
+      "subcategories": [
+        "Gaming Enthusiast",
+        "Creator OLED",
+        "Apple Silicon"
+      ]
+    },
+    {
+      "id": "cat-2",
+      "name": "Graphics Cards & GPUs",
+      "slug": "pc-components",
+      "icon": "memory",
+      "subcategories": [
+        "NVIDIA RTX 40-Series",
+        "AMD Radeon RX 7000",
+        "Workstation GPUs"
+      ]
+    },
+    {
+      "id": "cat-3",
+      "name": "Custom Gaming Rigs",
+      "slug": "custom-pc",
+      "icon": "desktop_windows",
+      "subcategories": [
+        "Liquid Cooled Rigs",
+        "Dual-Chamber Builds",
+        "Compact ITX Rigs"
+      ]
+    },
+    {
+      "id": "cat-4",
+      "name": "Sim Racing & Pro Gear",
+      "slug": "gaming-gear",
+      "icon": "sports_motorsports",
+      "subcategories": [
+        "Direct Drive Wheelbases",
+        "Load Cell Pedals",
+        "Cockpits & Rigs"
+      ]
+    },
+    {
+      "id": "cat-5",
+      "name": "OLED & Curved Monitors",
+      "slug": "monitors-displays",
+      "icon": "tv",
+      "subcategories": [
+        "QD-OLED 240Hz+",
+        "49\" Ultrawide Panels",
+        "Color-Calibrated 4K"
+      ]
+    },
+    {
+      "id": "cat-6",
+      "name": "Enterprise & Storage",
+      "slug": "networking-servers",
+      "icon": "dns",
+      "subcategories": [
+        "Gen5 NVMe Arrays",
+        "10GbE Network Switches",
+        "Synology NAS"
+      ]
+    }
+  ],
+  "brands": [
+    {
+      "id": "b-1",
+      "name": "ASUS ROG",
+      "activeSkus": 0,
+      "tier": "OFFICIAL DISTRIBUTOR"
+    },
+    {
+      "id": "b-2",
+      "name": "NVIDIA",
+      "activeSkus": 0,
+      "tier": "TIER 1 DIRECT"
+    },
+    {
+      "id": "b-3",
+      "name": "Samsung Electronics",
+      "activeSkus": 0,
+      "tier": "VERIFIED OEM"
+    },
+    {
+      "id": "b-4",
+      "name": "Lenovo Legion",
+      "activeSkus": 0,
+      "tier": "TIER 1 DIRECT"
+    },
+    {
+      "id": "b-5",
+      "name": "MSI Gaming",
+      "activeSkus": 0,
+      "tier": "OFFICIAL DISTRIBUTOR"
+    },
+    {
+      "id": "b-6",
+      "name": "Razer Hardware",
+      "activeSkus": 0,
+      "tier": "VERIFIED OEM"
+    },
+    {
+      "id": "b-7",
+      "name": "PXN Sim Pro",
+      "activeSkus": 0,
+      "tier": "OFFICIAL DISTRIBUTOR"
+    },
+    {
+      "id": "b-8",
+      "name": "Corsair",
+      "activeSkus": 0,
+      "tier": "TIER 1 DIRECT"
+    }
+  ],
+  "orders": [],
+  "customers": [
+    {
+      "id": "cust-1",
+      "name": "Tariq Mahmood",
+      "email": "tariq.m@nexustech.pk",
+      "phone": "+92 300 8472910",
+      "city": "Karachi",
+      "province": "Sindh",
+      "address": "DHA Phase 6, Khayaban-e-Shahbaz, Karachi",
+      "totalSpentPKR": 2450000,
+      "ordersCount": 8,
+      "tier": "VIP ENTERPRISE"
+    },
+    {
+      "id": "cust-2",
+      "name": "Bilal Ahmed",
+      "email": "bilal.ahmed.dev@gmail.com",
+      "phone": "+92 321 4459812",
+      "city": "Lahore",
+      "province": "Punjab",
+      "address": "Gulberg III, Near MM Alam Rd, Lahore",
+      "totalSpentPKR": 1840000,
+      "ordersCount": 4,
+      "tier": "VIP BUYER"
+    },
+    {
+      "id": "cust-3",
+      "name": "Zainab Khan",
+      "email": "zainab.k@creativestudio.isb",
+      "phone": "+92 333 5184920",
+      "city": "Islamabad",
+      "province": "ICT",
+      "address": "Sector F-7/2, Street 18, Islamabad",
+      "totalSpentPKR": 985000,
+      "ordersCount": 3,
+      "tier": "REPEAT RETAIL"
+    }
+  ],
+  "settings": {
+    "storeName": "LAPTOPIA Hardware Lab PK",
+    "baseCurrency": "PKR",
+    "currencySymbol": "Rs.",
+    "supportPhone": "+92 300 0000000",
+    "supportEmail": "orders@laptops.pk",
+    "warehouseAddress": "Commercial Area, Phase 6, DHA, Karachi, Sindh",
+    "lahoreAddress": "Suite 402, Precision Tech Tower, Main Boulevard, Gulberg III, Lahore",
+    "maxCodLimitPKR": 500000,
+    "otpVerificationEnabled": true,
+    "maintenanceMode": false,
+    "adminSecretKey": "laptopia2025"
+  }
+}
