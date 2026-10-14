@@ -1,15 +1,8 @@
 import { Router } from 'express';
-import { getCustomers } from '../db/store.js';
+import { getCustomers } from '../controllers/customerController.js';
 
 const router = Router();
 
-router.get('/', (req, res) => {
-  try {
-    const customers = getCustomers();
-    res.json({ success: true, count: customers.length, data: customers });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
+router.get('/', getCustomers);
 
 export default router;

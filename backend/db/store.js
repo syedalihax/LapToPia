@@ -33,7 +33,6 @@ function writeStore(store) {
   }
 }
 
-// Product Operations
 export function getProducts(filters = {}) {
   const store = readStore();
   let list = store.products || [];
@@ -132,7 +131,6 @@ export function deleteProduct(id) {
   return false;
 }
 
-// Order Operations with Auto Stock Deduction
 export function getOrders() {
   const store = readStore();
   return store.orders || [];
@@ -171,7 +169,6 @@ export function addOrder(orderData) {
     createdAt: now.toISOString()
   };
 
-  // Automated Stock Deduction
   if (Array.isArray(newOrder.items) && store.products) {
     for (const item of newOrder.items) {
       const prodIndex = store.products.findIndex(p => p.id === item.productId || p.sku === item.sku);
@@ -190,7 +187,6 @@ export function addOrder(orderData) {
   store.orders = store.orders || [];
   store.orders.unshift(newOrder);
 
-  // Update or insert customer history
   if (newOrder.customer.phone || newOrder.customer.email) {
     store.customers = store.customers || [];
     const existingCustIndex = store.customers.findIndex(c =>
@@ -235,7 +231,6 @@ export function updateOrderStatus(orderId, newStatus) {
   return store.orders[index];
 }
 
-// Categories & Brands
 export function getCategories() {
   const store = readStore();
   return store.categories || [];
@@ -246,7 +241,6 @@ export function getBrands() {
   return store.brands || [];
 }
 
-// Store Settings
 export function getSettings() {
   const store = readStore();
   return store.settings || {};
@@ -259,7 +253,6 @@ export function updateSettings(updates) {
   return store.settings;
 }
 
-// Customer Directory
 export function getCustomers() {
   const store = readStore();
   return store.customers || [];

@@ -1,6 +1,0 @@
-{
-  "summary": "Architectural and technical implementation plan for LAPTOPIA Enthusiast Hardware E-Commerce full-stack web application. Includes pure JavaScript/JSX modular separation (backend/ & frontend/), secret admin route, auto stock deduction, 1-5 image uploads, Cash on Delivery with downloadable invoices, and Framer Motion performance optimizations.",
-  "updatedAt": "2026-10-13T07:06:46.461639316Z",
-  "requestFeedback": true,
-  "userFacing": true
-}
