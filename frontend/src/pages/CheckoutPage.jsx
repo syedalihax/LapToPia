@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
+import Icon from '../components/Icon.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import InvoiceModal from '../components/InvoiceModal.jsx';
+import { apiRequest, parseApiResponse } from '../utils/api.js';
+import { useStoreSettings } from '../context/StoreSettingsContext.jsx';
 
 export default function CheckoutPage({ onNavigate }) {
   const { cartItems, grossTotalPKR, clearCart } = useCart();
+  const settings = useStoreSettings();
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -22,6 +26,22 @@ export default function CheckoutPage({ onNavigate }) {
   const [placedOrder, setPlacedOrder] = useState(null);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  React.useEffect(() => {
+    apiRequest('/api/profile')
+      .then(parseApiResponse)
+      .then(({ data }) => setFormData(current => ({
+        ...current,
+        fullName: data.name || current.fullName,
+        email: data.email || current.email,
+        phone: data.phone || current.phone,
+        province: data.address?.province || current.province,
+        city: data.address?.city || current.city,
+        postalCode: data.address?.postalCode || current.postalCode,
+        streetAddress: data.address?.street || current.streetAddress
+      })))
+      .catch(() => {});
+  }, []);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -50,7 +70,7 @@ export default function CheckoutPage({ onNavigate }) {
 
     setSubmitting(true);
     try {
-      const response = await fetch('/api/orders', {
+      const response = await apiRequest('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -81,7 +101,7 @@ export default function CheckoutPage({ onNavigate }) {
         <div className="max-w-2xl mx-auto px-4 flex flex-col gap-6">
           <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] p-8 rounded-2xl shadow-xl flex flex-col items-center text-center gap-6">
             <div className="w-16 h-16 rounded-full bg-black text-white dark:bg-white dark:text-black flex items-center justify-center">
-              <span className="material-symbols-outlined text-[36px] font-bold">check</span>
+              <Icon className="text-[36px] font-bold">check</Icon>
             </div>
 
             <div>
@@ -129,17 +149,17 @@ export default function CheckoutPage({ onNavigate }) {
                 onClick={() => setShowInvoiceModal(true)}
                 className="w-full sm:flex-1 py-3 px-4 bg-black text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 font-['Space_Grotesk'] text-[12px] font-bold uppercase rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[18px]">receipt_long</span>
+                <Icon className="text-[18px]">receipt_long</Icon>
                 <span>Download / Print Invoice</span>
               </button>
 
               <a
-                href={`https://wa.me/923000000000?text=${encodeURIComponent(`Salam LAPTOPIA! Maine order place kiya hai ${placedOrder.orderNumber}. Barah-e-karam dispatch confirm karein.`)}`}
+                href={`https://wa.me/${(settings.whatsappPhone || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Salam ${settings.storeName}! Maine order place kiya hai ${placedOrder.orderNumber}. Barah-e-karam dispatch confirm karein.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:flex-1 py-3 px-4 bg-[#25D366] hover:bg-[#20ba5a] text-black font-['Space_Grotesk'] text-[12px] font-bold uppercase rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[18px]">chat</span>
+                <Icon className="text-[18px]">chat</Icon>
                 <span>Track on WhatsApp</span>
               </a>
             </div>
@@ -180,14 +200,14 @@ export default function CheckoutPage({ onNavigate }) {
             onClick={() => onNavigate && onNavigate('cart')}
             className="text-[#71717A] hover:text-black dark:hover:text-white text-[12px] font-['Inter'] flex items-center gap-1 cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            <Icon className="text-[16px]">arrow_back</Icon>
             <span>Return to Cart</span>
           </button>
         </div>
 
         {errorMessage && (
           <div className="bg-[#93000A]/20 border border-[#93000A] p-4 rounded-lg text-red-600 dark:text-red-400 font-['Inter'] text-[13px] flex items-center gap-3">
-            <span className="material-symbols-outlined text-[20px]">error</span>
+            <Icon className="text-[20px]">error</Icon>
             <span>{errorMessage}</span>
           </div>
         )}
@@ -432,7 +452,7 @@ export default function CheckoutPage({ onNavigate }) {
                   : 'bg-black text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200'
               }`}
             >
-              <span className="material-symbols-outlined text-[20px]">lock</span>
+              <Icon className="text-[20px]">lock</Icon>
               <span>{submitting ? 'RESERVING INVENTORY...' : 'PLACE ORDER (CASH ON DELIVERY)'}</span>
             </button>
           </form>
@@ -489,11 +509,11 @@ export default function CheckoutPage({ onNavigate }) {
               {/* Trust badges */}
               <div className="flex flex-col gap-2 pt-1 font-['JetBrains_Mono'] text-[11px] text-[#71717A]">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[16px] text-black dark:text-white">verified</span>
+                  <Icon className="text-[16px] text-black dark:text-white">verified</Icon>
                   <span>100% Factory Sealed & Genuine Imports</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[16px] text-black dark:text-white">published_with_changes</span>
+                  <Icon className="text-[16px] text-black dark:text-white">published_with_changes</Icon>
                   <span>7-Day Replacement Inspection Guarantee</span>
                 </div>
               </div>

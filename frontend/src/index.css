@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
   html, body {
@@ -55,6 +56,63 @@
   }
 }
 
+:root [class~="text-[#71717A]"] {
+  color: #52525B;
+}
+
+html.dark [class~="text-[#71717A]"],
+html.dark [class~="dark:text-[#71717A]"] {
+  color: #A1A1AA;
+}
+
+html.light .admin-console {
+  background-color: #F4F4F5 !important;
+  color: #18181B;
+}
+
+html.light .admin-console [class~="bg-[#131315]"],
+html.light .admin-console [class~="bg-[#09090B]"],
+html.light .admin-console [class~="bg-[#09090B]/90"] { background-color: #FFFFFF !important; }
+html.light .admin-console [class~="bg-[#0E0E10]"],
+html.light .admin-console [class~="bg-[#121215]"],
+html.light .admin-console [class~="bg-[#121215]/90"] { background-color: #F4F4F5 !important; }
+html.light .admin-console [class~="bg-[#18181B]"],
+html.light .admin-console [class~="bg-[#1A1A1E]"],
+html.light .admin-console [class~="bg-[#202024]"],
+html.light .admin-console [class~="bg-[#222226]"] { background-color: #E4E4E7 !important; }
+html.light .admin-console [class~="bg-[#27272A]"] { background-color: #D4D4D8 !important; }
+html.light .admin-console [class~="text-white"] { color: #18181B !important; }
+html.light .admin-console [class~="text-[#FAFAFA]"],
+html.light .admin-console [class~="text-[#A1A1AA]"],
+html.light .admin-console [class~="text-[#D4D4D8]"] { color: #3F3F46 !important; }
+html.light .admin-console [class~="text-[#71717A]"] { color: #52525B !important; }
+html.light .admin-console [class~="border-[#27272A]"],
+html.light .admin-console [class~="border-[#3F3F46]"] { border-color: #D4D4D8 !important; }
+html.light .admin-console [class~="border-white"] { border-color: #52525B !important; }
+html.light .admin-console input:not([type="checkbox"]),
+html.light .admin-console textarea,
+html.light .admin-console select { color: #18181B; background-color: #FFFFFF; }
+html.light .admin-console input:not([type="checkbox"]),
+html.light .admin-console textarea { color: #18181B; background-color: #FFFFFF !important; border-color: #D4D4D8 !important; }
+html.light .admin-console input::placeholder,
+html.light .admin-console textarea::placeholder { color: #71717A; }
+html.light .admin-console option { background-color: #FFFFFF; color: #18181B; }
+
+html.light .admin-console [class~="hover:bg-[#09090B]"]:hover,
+html.light .admin-console [class~="hover:bg-[#121215]"]:hover,
+html.light .admin-console [class~="hover:bg-[#18181B]"]:hover,
+html.light .admin-console [class~="hover:bg-[#202024]"]:hover,
+html.light .admin-console [class~="hover:bg-[#222226]"]:hover,
+html.light .admin-console [class~="hover:bg-[#27272A]"]:hover {
+  background-color: #E4E4E7 !important;
+}
+html.light .admin-console [class~="hover:text-white"]:hover {
+  color: #18181B !important;
+}
+html.light .admin-console [class~="hover:border-white"]:hover {
+  border-color: #52525B !important;
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 6px;
@@ -72,18 +130,85 @@ html.dark ::-webkit-scrollbar-thumb {
 }
 
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
   body * {
     visibility: hidden;
+  }
+  #invoice-modal-overlay,
+  #invoice-modal-overlay * {
+    visibility: visible;
+  }
+  #invoice-modal-overlay {
+    position: static !important;
+    display: block !important;
+    padding: 0 !important;
+    background: white !important;
+    backdrop-filter: none !important;
+  }
+  #invoice-modal-overlay .invoice-modal-panel {
+    position: static !important;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+  #invoice-modal-overlay .invoice-modal-actions,
+  #invoice-modal-overlay > .invoice-modal-panel > div:first-child {
+    display: none !important;
   }
   #printable-invoice, #printable-invoice * {
     visibility: visible;
   }
   #printable-invoice {
-    position: absolute;
-    left: 0;
-    top: 0;
+    position: static !important;
     width: 100%;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border: 0 !important;
+    padding: 0 !important;
     background: white !important;
     color: black !important;
+  }
+  #printable-invoice .invoice-items-table {
+    display: block !important;
+    overflow: visible !important;
+  }
+  #printable-invoice .invoice-items-mobile {
+    display: none !important;
+  }
+  #printable-invoice table {
+    width: 100% !important;
+    min-width: 0 !important;
+    border-collapse: collapse;
+  }
+  #printable-invoice th,
+  #printable-invoice td {
+    padding: 6px !important;
+    border-bottom: 1px solid #D4D4D8;
+    color: #18181B !important;
+    overflow-wrap: anywhere;
+  }
+  #printable-invoice [class~="bg-[#09090B]"],
+  #printable-invoice [class~="bg-[#121215]"],
+  #printable-invoice [class~="bg-[#18181B]"],
+  #printable-invoice [class~="bg-[#27272A]"] {
+    background: white !important;
+  }
+  #printable-invoice [class~="text-white"],
+  #printable-invoice [class~="text-[#FAFAFA]"],
+  #printable-invoice [class~="text-[#A1A1AA]"],
+  #printable-invoice [class~="text-[#71717A]"] {
+    color: #18181B !important;
+  }
+  #printable-invoice img {
+    print-color-adjust: exact;
   }
 }

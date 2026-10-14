@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Icon from '../components/Icon.jsx';
 import { useCart } from '../context/CartContext.jsx';
 
 export default function ProductDetailPage({ productId, onNavigate }) {
@@ -120,24 +121,13 @@ export default function ProductDetailPage({ productId, onNavigate }) {
           <div className="lg:col-span-5 flex flex-col gap-5">
             <div className="flex flex-col gap-1">
               <span className="font-['Space_Grotesk'] text-[11px] uppercase tracking-wider text-[#71717A] font-bold">
-                {product.brand || 'ARCHITECT GRADE'} • SKU: {product.sku}
+                {product.brand || product.category} • SKU: {product.sku}
               </span>
               <h1 className="font-['Space_Grotesk'] text-[28px] sm:text-[34px] font-bold text-black dark:text-white tracking-tight leading-tight">
                 {product.title}
               </h1>
+              {product.description && <p className="mt-2 text-sm leading-relaxed text-[#71717A]">{product.description}</p>}
 
-              {/* Rating */}
-              <div className="flex items-center gap-2 pt-1">
-                <div className="flex items-center text-black dark:text-white">
-                  <span className="material-symbols-outlined text-[16px]">star</span>
-                  <span className="material-symbols-outlined text-[16px]">star</span>
-                  <span className="material-symbols-outlined text-[16px]">star</span>
-                  <span className="material-symbols-outlined text-[16px]">star</span>
-                  <span className="material-symbols-outlined text-[16px]">star</span>
-                </div>
-                <span className="font-['JetBrains_Mono'] text-[12px] font-bold text-black dark:text-white">5.0</span>
-                <span className="font-['Inter'] text-[12px] text-[#71717A]">(Verified Owner Reviews)</span>
-              </div>
             </div>
 
             {/* Price & Stock Container */}
@@ -145,9 +135,6 @@ export default function ProductDetailPage({ productId, onNavigate }) {
               <div className="flex items-baseline justify-between">
                 <span className="font-['Space_Grotesk'] text-[32px] font-bold text-black dark:text-white">
                   Rs. {Number(currentPrice).toLocaleString()}
-                </span>
-                <span className="bg-[#F4F4F5] dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] px-2.5 py-1 rounded font-['JetBrains_Mono'] text-[11px] text-[#71717A]">
-                  TAX INCLUSIVE
                 </span>
               </div>
 
@@ -193,7 +180,7 @@ export default function ProductDetailPage({ productId, onNavigate }) {
                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
                     className="w-9 h-9 rounded bg-[#F4F4F5] dark:bg-[#18181B] hover:bg-[#E4E4E7] dark:hover:bg-[#27272A] text-black dark:text-white flex items-center justify-center transition-colors cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[16px]">remove</span>
+                    <Icon className="text-[16px]">remove</Icon>
                   </button>
                   <span className="w-12 text-center font-['JetBrains_Mono'] text-[13px] font-bold text-black dark:text-white">
                     {quantity}
@@ -202,7 +189,7 @@ export default function ProductDetailPage({ productId, onNavigate }) {
                     onClick={() => setQuantity(q => Math.min(product.stockQuantity || 1, q + 1))}
                     className="w-9 h-9 rounded bg-[#F4F4F5] dark:bg-[#18181B] hover:bg-[#E4E4E7] dark:hover:bg-[#27272A] text-black dark:text-white flex items-center justify-center transition-colors cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[16px]">add</span>
+                    <Icon className="text-[16px]">add</Icon>
                   </button>
                 </div>
 
@@ -216,7 +203,7 @@ export default function ProductDetailPage({ productId, onNavigate }) {
                       : 'bg-[#F4F4F5] dark:bg-[#18181B] text-[#71717A] cursor-not-allowed border border-[#E4E4E7] dark:border-[#27272A]'
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[18px]">shopping_bag</span>
+                  <Icon className="text-[18px]">shopping_bag</Icon>
                   <span>{product.stockQuantity > 0 ? 'Add to Cart' : 'Out of Stock'}</span>
                 </button>
               </div>
@@ -227,33 +214,12 @@ export default function ProductDetailPage({ productId, onNavigate }) {
                   onClick={handleBuyNow}
                   className="w-full bg-[#F4F4F5] dark:bg-[#18181B] hover:bg-[#E4E4E7] dark:hover:bg-[#27272A] border border-[#D4D4D8] dark:border-[#3F3F46] text-black dark:text-white font-['Space_Grotesk'] text-[13px] font-bold uppercase tracking-wider py-3.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[18px]">payments</span>
+                  <Icon className="text-[18px]">payments</Icon>
                   <span>Buy Now with Cash on Delivery (COD)</span>
                 </button>
               )}
             </div>
 
-            {/* 3 Clean Trust Badges */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
-              <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] p-2.5 rounded-lg flex items-center gap-2 shadow-sm">
-                <span className="material-symbols-outlined text-[18px] text-black dark:text-white">verified</span>
-                <span className="font-['JetBrains_Mono'] text-[10px] text-[#71717A] font-medium leading-tight">
-                  100% Factory Sealed
-                </span>
-              </div>
-              <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] p-2.5 rounded-lg flex items-center gap-2 shadow-sm">
-                <span className="material-symbols-outlined text-[18px] text-black dark:text-white">local_shipping</span>
-                <span className="font-['JetBrains_Mono'] text-[10px] text-[#71717A] font-medium leading-tight">
-                  Insured TCS Air Courier
-                </span>
-              </div>
-              <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] p-2.5 rounded-lg flex items-center gap-2 shadow-sm">
-                <span className="material-symbols-outlined text-[18px] text-black dark:text-white">verified_user</span>
-                <span className="font-['JetBrains_Mono'] text-[10px] text-[#71717A] font-medium leading-tight">
-                  7-Day Replacement
-                </span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -290,16 +256,16 @@ export default function ProductDetailPage({ productId, onNavigate }) {
           {activeTab === 'overview' && (
             <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] rounded-xl p-6 sm:p-8 flex flex-col gap-6 shadow-sm">
               <h3 className="font-['Space_Grotesk'] text-[18px] text-black dark:text-white font-bold">
-                Flagship Performance Architecture
+                Product Details
               </h3>
               <p className="font-['Inter'] text-[14px] text-[#71717A] leading-relaxed max-w-4xl">
-                Engineered for elite power users, engineers, and esports competitors. Every system imported through LAPTOPIA PK undergoes strict bench testing, thermal verification, and serial certification before dispatch.
+                {product.title} is listed under {product.category}. Check the specifications, price, and stock details before ordering.
               </p>
               {Array.isArray(product.specs) && product.specs.length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                   {product.specs.map((s, idx) => (
                     <div key={idx} className="flex items-center gap-3 p-3 bg-[#F4F4F5] dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] rounded-lg">
-                      <span className="material-symbols-outlined text-[18px] text-black dark:text-white">check_circle</span>
+                      <Icon className="text-[18px] text-black dark:text-white">check_circle</Icon>
                       <span className="font-['JetBrains_Mono'] text-[12px] text-black dark:text-white">
                         {typeof s === 'string' ? s : `${s.label}: ${s.value}`}
                       </span>
@@ -327,11 +293,11 @@ export default function ProductDetailPage({ productId, onNavigate }) {
                   <span className="sm:col-span-2 text-black dark:text-white">{product.sku}</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 py-3.5 px-6">
-                  <span className="text-[#71717A]">MSRP Price (PKR)</span>
+                  <span className="text-[#71717A]">Price (PKR)</span>
                   <span className="sm:col-span-2 text-black dark:text-white font-bold">Rs. {Number(product.pricePKR).toLocaleString()}</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 py-3.5 px-6 bg-[#F4F4F5] dark:bg-[#0E0E10]">
-                  <span className="text-[#71717A]">Allocable Stock</span>
+                  <span className="text-[#71717A]">Stock</span>
                   <span className="sm:col-span-2 text-black dark:text-white">{product.stockQuantity} units available</span>
                 </div>
                 {Array.isArray(product.specs) && product.specs.map((s, idx) => (
@@ -349,7 +315,7 @@ export default function ProductDetailPage({ productId, onNavigate }) {
             <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] rounded-xl p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 shadow-sm">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2 text-black dark:text-white font-['Space_Grotesk'] text-[16px] font-bold">
-                  <span className="material-symbols-outlined text-[22px]">local_shipping</span>
+                  <Icon className="text-[22px]">local_shipping</Icon>
                   <span>Delivery Timelines Across Pakistan</span>
                 </div>
                 <p className="font-['Inter'] text-[13px] text-[#71717A] leading-relaxed">
@@ -359,7 +325,7 @@ export default function ProductDetailPage({ productId, onNavigate }) {
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2 text-black dark:text-white font-['Space_Grotesk'] text-[16px] font-bold">
-                  <span className="material-symbols-outlined text-[22px]">payments</span>
+                  <Icon className="text-[22px]">payments</Icon>
                   <span>Cash on Delivery (COD) Doorstep Terms</span>
                 </div>
                 <p className="font-['Inter'] text-[13px] text-[#71717A] leading-relaxed">

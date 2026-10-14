@@ -1,45 +1,38 @@
 import mongoose from 'mongoose';
 import Category from '../models/Category.js';
-import Customer from '../models/Customer.js';
+import Brand from '../models/Brand.js';
 import Product from '../models/Product.js';
 import Setting from '../models/Setting.js';
+import User from '../models/User.js';
 
 const defaultCategories = [
   {
-    name: 'High-Performance Laptops',
+    name: 'Laptops',
     slug: 'laptops',
+    value: 'Laptops',
     icon: 'laptop_chromebook',
-    subcategories: ['Gaming Enthusiast', 'Creator OLED', 'Apple Silicon']
+    subcategories: ['Gaming', 'Student', 'Office', 'Normal'].map(name => ({ name, slug: name.toLowerCase() }))
   },
   {
-    name: 'Graphics Cards & GPUs',
-    slug: 'pc-components',
-    icon: 'memory',
-    subcategories: ['NVIDIA RTX 40-Series', 'AMD Radeon RX 7000', 'Workstation GPUs']
-  },
-  {
-    name: 'Custom Gaming Rigs',
-    slug: 'custom-pc',
+    name: 'PC',
+    slug: 'pc',
+    value: 'PC',
     icon: 'desktop_windows',
-    subcategories: ['Liquid Cooled Rigs', 'Dual-Chamber Builds', 'Compact ITX Rigs']
+    subcategories: ['Gaming', 'Student', 'Office', 'Normal'].map(name => ({ name, slug: name.toLowerCase() }))
   },
   {
-    name: 'Sim Racing & Pro Gear',
-    slug: 'gaming-gear',
-    icon: 'sports_motorsports',
-    subcategories: ['Direct Drive Wheelbases', 'Load Cell Pedals', 'Cockpits & Rigs']
-  },
-  {
-    name: 'OLED & Curved Monitors',
-    slug: 'monitors-displays',
-    icon: 'tv',
-    subcategories: ['QD-OLED 240Hz+', '49" Ultrawide Panels', 'Color-Calibrated 4K']
-  },
-  {
-    name: 'Enterprise & Storage',
-    slug: 'networking-servers',
+    name: 'Servers',
+    slug: 'servers',
+    value: 'Servers',
     icon: 'dns',
-    subcategories: ['Gen5 NVMe Arrays', '10GbE Network Switches', 'Synology NAS']
+    subcategories: ['Gaming', 'Student', 'Office', 'Normal'].map(name => ({ name, slug: name.toLowerCase() }))
+  },
+  {
+    name: 'Miner Machines',
+    slug: 'miner-machines',
+    value: 'Miner Machines',
+    icon: 'memory',
+    subcategories: ['Gaming', 'Student', 'Office', 'Normal'].map(name => ({ name, slug: name.toLowerCase() }))
   }
 ];
 
@@ -47,121 +40,22 @@ const defaultSettings = {
   storeName: 'LAPTOPIA Hardware Lab PK',
   baseCurrency: 'PKR',
   currencySymbol: 'Rs.',
-  supportPhone: '+92 300 0000000',
-  supportEmail: 'orders@laptops.pk',
+  supportPhone: '+92 345 800 5566',
+  whatsappPhone: '+92 345 800 5566',
+  supportEmail: 'orders@laptopia.com.pk',
   warehouseAddress: 'Commercial Area, Phase 6, DHA, Karachi, Sindh',
   lahoreAddress: 'Suite 402, Precision Tech Tower, Main Boulevard, Gulberg III, Lahore',
   maxCodLimitPKR: 500000,
   otpVerificationEnabled: true,
-  maintenanceMode: false,
-  adminSecretKey: 'laptopia2025'
+  maintenanceMode: false
 };
 
-const defaultProducts = [
-  {
-    title: 'ASUS ROG Zephyrus G14',
-    category: 'Laptops',
-    brand: 'ASUS ROG',
-    pricePKR: 549000,
-    originalPricePKR: 599000,
-    stockQuantity: 12,
-    sku: 'ASUS-G14-14',
-    images: ['https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=80'],
-    specs: [
-      { label: 'CPU', value: 'AMD Ryzen 9 7940HS' },
-      { label: 'GPU', value: 'NVIDIA RTX 4060 8GB' },
-      { label: 'RAM', value: '32GB DDR5' },
-      { label: 'Storage', value: '1TB NVMe SSD' }
-    ],
-    isFeatured: true,
-    status: 'ACTIVE'
-  },
-  {
-    title: 'MSI Stealth 16 Studio',
-    category: 'Laptops',
-    brand: 'MSI Gaming',
-    pricePKR: 639000,
-    originalPricePKR: 689000,
-    stockQuantity: 8,
-    sku: 'MSI-STEALTH-16',
-    images: ['https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=900&q=80'],
-    specs: [
-      { label: 'CPU', value: 'Intel Core i7-13700H' },
-      { label: 'GPU', value: 'RTX 4070 8GB' },
-      { label: 'RAM', value: '32GB DDR5' },
-      { label: 'Display', value: '16" QHD+ 240Hz' }
-    ],
-    isFeatured: true,
-    status: 'ACTIVE'
-  },
-  {
-    title: 'NVIDIA RTX 4090 Founders Edition',
-    category: 'Graphics Cards & GPUs',
-    brand: 'NVIDIA',
-    pricePKR: 420000,
-    originalPricePKR: 470000,
-    stockQuantity: 5,
-    sku: 'NVIDIA-4090-FE',
-    images: ['https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=900&q=80'],
-    specs: [
-      { label: 'GPU', value: 'RTX 4090' },
-      { label: 'VRAM', value: '24GB GDDR6X' },
-      { label: 'RTX', value: 'DLSS 3.5' },
-      { label: 'Interface', value: 'PCIe 4.0' }
-    ],
-    isFeatured: false,
-    status: 'ACTIVE'
-  },
-  {
-    title: 'Samsung Odyssey OLED G9',
-    category: 'OLED & Curved Monitors',
-    brand: 'Samsung Electronics',
-    pricePKR: 380000,
-    originalPricePKR: 430000,
-    stockQuantity: 4,
-    sku: 'SAMSUNG-G9-OLED',
-    images: ['https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=900&q=80'],
-    specs: [
-      { label: 'Panel', value: '49" Dual QHD OLED' },
-      { label: 'Refresh', value: '240Hz' },
-      { label: 'HDR', value: 'HDR True Black 400' },
-      { label: 'Curve', value: '1800R' }
-    ],
-    isFeatured: true,
-    status: 'ACTIVE'
-  }
-];
-
-const defaultCustomers = [
-  {
-    name: 'Tariq Mahmood',
-    email: 'tariq.m@nexustech.pk',
-    phone: '+92 300 8472910',
-    city: 'Karachi',
-    province: 'Sindh',
-    address: 'DHA Phase 6, Khayaban-e-Shahbaz, Karachi',
-    totalSpentPKR: 2450000,
-    ordersCount: 8,
-    tier: 'VIP ENTERPRISE'
-  },
-  {
-    name: 'Bilal Ahmed',
-    email: 'bilal.ahmed.dev@gmail.com',
-    phone: '+92 321 4459812',
-    city: 'Lahore',
-    province: 'Punjab',
-    address: 'Gulberg III, Near MM Alam Rd, Lahore',
-    totalSpentPKR: 1840000,
-    ordersCount: 4,
-    tier: 'VIP BUYER'
-  }
-];
-
 export async function connectDB() {
-  const mongoUri = process.env.MONGODB_URI;
-  if (!mongoUri) {
+  const configuredMongoUri = process.env.MONGODB_URI;
+  if (!configuredMongoUri) {
     throw new Error('MONGODB_URI is missing. Add it to backend/.env');
   }
+  const mongoUri = configuredMongoUri.replace(/([?&])databasessl=(true|false)(?=&|$)/i, '$1tls=$2');
 
   mongoose.set('strictQuery', true);
   await mongoose.connect(mongoUri);
@@ -170,23 +64,74 @@ export async function connectDB() {
 }
 
 async function seedDefaults() {
-  const categoriesCount = await Category.countDocuments();
-  if (categoriesCount === 0) {
-    await Category.insertMany(defaultCategories);
+  for (const category of defaultCategories) {
+    await Category.updateOne(
+      { slug: category.slug },
+      { $setOnInsert: category },
+      { upsert: true }
+    );
   }
 
-  const productsCount = await Product.countDocuments();
-  if (productsCount === 0) {
-    await Product.insertMany(defaultProducts);
+  const rawCategories = await Category.collection.find({}).toArray();
+  rawCategories.sort((left, right) => left.slug.localeCompare(right.slug));
+  const usedSlugs = new Set(rawCategories.map(category => category.slug));
+  for (const category of rawCategories) {
+    const subcategories = (category.subcategories || []).map(item => {
+      const name = (typeof item === 'string' ? item : item?.name || '').trim();
+      if (!name) return null;
+      const baseSlug = `${category.slug}-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+      let slug = item?.slug || baseSlug;
+      if (usedSlugs.has(slug)) slug = baseSlug;
+      let suffix = 2;
+      while (usedSlugs.has(slug)) slug = `${baseSlug}-${suffix++}`;
+      usedSlugs.add(slug);
+      return typeof item === 'string' || item.slug !== slug ? { name, slug } : item;
+    }).filter(Boolean);
+    if (JSON.stringify(category.subcategories || []) !== JSON.stringify(subcategories)) {
+      await Category.collection.updateOne({ _id: category._id }, { $set: { subcategories } });
+    }
   }
 
-  const customersCount = await Customer.countDocuments();
-  if (customersCount === 0) {
-    await Customer.insertMany(defaultCustomers);
+  await Product.updateMany({ category: 'Personal Computer' }, { $set: { category: 'PC' } });
+
+  const productBrandNames = await Product.distinct('brand');
+  for (const name of productBrandNames.filter(Boolean)) {
+    await Brand.updateOne(
+      { name },
+      { $setOnInsert: { name, slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), tier: 'VERIFIED OEM' } },
+      { upsert: true }
+    );
   }
 
   const settingsCount = await Setting.countDocuments();
   if (settingsCount === 0) {
     await Setting.create(defaultSettings);
+  }
+
+  await ensureAdminAccount();
+}
+
+async function ensureAdminAccount() {
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const password = process.env.ADMIN_PASSWORD;
+  if (!email || !password) {
+    console.warn('Admin account not provisioned: set ADMIN_EMAIL and ADMIN_PASSWORD in backend/.env');
+    return;
+  }
+  if (password.length < 12) {
+    console.warn('Admin account not provisioned: ADMIN_PASSWORD must be at least 12 characters');
+    return;
+  }
+
+  const name = process.env.ADMIN_NAME?.trim() || 'LAPTOPIA Admin';
+  const existingAdmin = await User.findOne({ email });
+  if (!existingAdmin) {
+    await User.create({ name, email, password, role: 'admin' });
+    console.log(`Admin account provisioned for ${email}`);
+    return;
+  }
+
+  if (existingAdmin.role !== 'admin') {
+    console.warn(`Admin account not provisioned: ${email} belongs to a non-admin user. Use a trusted admin account to resolve the conflict.`);
   }
 }

@@ -1,11 +1,13 @@
 import { Router } from 'express';
-import { createOrder, getOrderById, getOrders, updateOrderStatus } from '../controllers/orderController.js';
+import { createOrder, getMyOrders, getOrderById, getOrders, updateOrderStatus } from '../controllers/orderController.js';
+import { authorize, protect } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 
-router.get('/', getOrders);
-router.get('/:id', getOrderById);
-router.post('/', createOrder);
-router.patch('/:id/status', updateOrderStatus);
+router.get('/', protect, authorize('admin'), getOrders);
+router.get('/mine', protect, getMyOrders);
+router.get('/:id', protect, authorize('admin'), getOrderById);
+router.post('/', protect, createOrder);
+router.patch('/:id/status', protect, authorize('admin'), updateOrderStatus);
 
 export default router;

@@ -1,6 +1,16 @@
 import ApiError from '../utils/ApiError.js';
 
 export default function errorMiddleware(err, req, res, next) {
+  if (err.name === 'MulterError') {
+    const statusCode = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+    const message = err.code === 'LIMIT_FILE_SIZE'
+      ? 'Each image must be 5 MB or smaller'
+      : err.code === 'LIMIT_FILE_COUNT'
+        ? 'Maximum 5 images can be uploaded at once'
+        : err.message;
+    return res.status(statusCode).json({ success: false, error: message });
+  }
+
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({
       success: false,

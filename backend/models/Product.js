@@ -11,11 +11,15 @@ const specItemSchema = new mongoose.Schema(
 const productSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
+    slug: { type: String, trim: true, lowercase: true, unique: true, sparse: true },
+    description: { type: String, trim: true, default: '' },
     category: { type: String, default: 'Laptops' },
+    subcategory: { type: String, trim: true, default: '' },
+    subcategorySlug: { type: String, trim: true, lowercase: true, default: '' },
     brand: { type: String, default: 'Custom Build' },
-    pricePKR: { type: Number, required: true, min: 0 },
+    pricePKR: { type: Number, required: true, min: 0.01 },
     originalPricePKR: { type: Number, default: 0, min: 0 },
-    stockQuantity: { type: Number, default: 0, min: 0 },
+    stockQuantity: { type: Number, default: 0, min: 0, validate: Number.isInteger },
     sku: { type: String, required: true, unique: true, trim: true },
     images: [{ type: String, required: true }],
     specs: [specItemSchema],

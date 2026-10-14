@@ -9,6 +9,7 @@ import categoriesRouter from './routes/categories.js';
 import customersRouter from './routes/customers.js';
 import settingsRouter from './routes/settings.js';
 import authRouter from './routes/auth.js';
+import profileRouter from './routes/profile.js';
 import notFoundMiddleware from './middlewares/notFoundMiddleware.js';
 import errorMiddleware from './middlewares/errorMiddleware.js';
 
@@ -25,11 +26,20 @@ const allowedOrigins = [
   'http://127.0.0.1:5173',
   'http://127.0.0.1:3000'
 ].filter(Boolean);
+const isAllowedDevelopmentOrigin = origin => {
+  if (process.env.NODE_ENV === 'production') return false;
+  try {
+    const { hostname, protocol } = new URL(origin);
+    return protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(hostname);
+  } catch {
+    return false;
+  }
+};
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin) || isAllowedDevelopmentOrigin(origin)) {
         callback(null, true);
         return;
       }
@@ -51,6 +61,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRouter);
+app.use('/api/profile', profileRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/categories', categoriesRouter);

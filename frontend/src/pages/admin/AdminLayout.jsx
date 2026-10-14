@@ -1,7 +1,10 @@
 import React from 'react';
+import Icon from '../../components/Icon.jsx';
 import Logo from '../../components/Logo.jsx';
+import { useTheme } from '../../context/ThemeContext.jsx';
 
-export default function AdminLayout({ activeTab = 'overview', onTabChange, onNavigate, onOpenNewProduct, children }) {
+export default function AdminLayout({ activeTab = 'overview', onTabChange, onNavigate, onOpenNewProduct, user, onLogout, children }) {
+  const { toggleTheme, isDark } = useTheme();
   const menuItems = [
     { id: 'overview', label: 'Overview', icon: 'dashboard' },
     { id: 'products', label: 'Products & Inventory', icon: 'inventory_2' },
@@ -12,7 +15,7 @@ export default function AdminLayout({ activeTab = 'overview', onTabChange, onNav
   ];
 
   return (
-    <div className="min-h-screen bg-[#131315] text-[#FAFAFA] flex">
+    <div className="admin-console min-h-screen bg-[#131315] text-[#FAFAFA] flex">
       {/* Fixed Admin Sidebar */}
       <aside className="fixed left-0 top-0 h-full w-64 bg-[#09090B] z-50 flex flex-col justify-between border-r border-[#27272A]">
         <div className="flex flex-col">
@@ -52,7 +55,7 @@ export default function AdminLayout({ activeTab = 'overview', onTabChange, onNav
                         : 'text-[#A1A1AA] hover:bg-[#121215] hover:text-white'
                     }`}
                   >
-                    <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+                    <Icon className="text-[18px]">{item.icon}</Icon>
                     <span>{item.label}</span>
                   </button>
                 );
@@ -68,22 +71,30 @@ export default function AdminLayout({ activeTab = 'overview', onTabChange, onNav
             className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#121215] hover:bg-[#18181B] text-[#A1A1AA] hover:text-white border border-[#27272A] font-['JetBrains_Mono'] text-[11px] transition-colors cursor-pointer"
           >
             <span className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[16px]">storefront</span>
+              <Icon className="text-[16px]">storefront</Icon>
               <span>Live Storefront</span>
             </span>
-            <span className="material-symbols-outlined text-[14px]">arrow_outward</span>
+            <Icon className="text-[14px]">arrow_outward</Icon>
           </button>
 
-          <div className="flex items-center justify-between p-2 rounded-lg bg-[#121215] border border-[#27272A]">
+          <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-[#121215] border border-[#27272A]">
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center font-bold text-[12px]">
-                <span className="material-symbols-outlined text-[16px]">admin_panel_settings</span>
+                <Icon className="text-[16px]">admin_panel_settings</Icon>
               </div>
               <div className="flex flex-col">
-                <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white leading-tight">Admin Lead</span>
-                <span className="font-['JetBrains_Mono'] text-[10px] text-[#71717A] leading-tight">ops@laptopia.io</span>
+                <span className="font-['Space_Grotesk'] text-[12px] font-bold text-white leading-tight">{user?.name || 'Admin'}</span>
+                <span className="font-['JetBrains_Mono'] text-[10px] text-[#71717A] leading-tight">{user?.email || ''}</span>
               </div>
             </div>
+            <button
+              onClick={onLogout}
+              className="p-2 rounded text-[#A1A1AA] hover:text-white hover:bg-[#18181B] transition-colors cursor-pointer"
+              title="Sign out"
+              aria-label="Sign out"
+            >
+              <Icon className="text-[16px]">logout</Icon>
+            </button>
           </div>
         </div>
       </aside>
@@ -101,9 +112,17 @@ export default function AdminLayout({ activeTab = 'overview', onTabChange, onNav
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Solid cluster status tag - strictly NO pulsing dots */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={isDark ? 'Switch admin console to light theme' : 'Switch admin console to dark theme'}
+              title={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#3F3F46] bg-[#18181B] text-white transition-colors hover:bg-[#27272A]"
+            >
+              <Icon className="text-lg">{isDark ? 'light_mode' : 'dark_mode'}</Icon>
+            </button>
             <div className="px-3 py-1 bg-[#121215] border border-[#27272A] rounded font-['JetBrains_Mono'] text-[11px] text-[#A1A1AA]">
-              Database Cluster: Connected
+              Database: Connected
             </div>
 
             {/* Quick Add Product Trigger */}
@@ -111,8 +130,8 @@ export default function AdminLayout({ activeTab = 'overview', onTabChange, onNav
               onClick={onOpenNewProduct}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white text-black hover:bg-neutral-200 font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[16px]">add</span>
-              <span>+ New Product</span>
+              <Icon className="text-[16px]">add</Icon>
+              <span>New Product</span>
             </button>
           </div>
         </header>

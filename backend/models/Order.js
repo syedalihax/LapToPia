@@ -29,6 +29,7 @@ const customerSummarySchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
   {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
     orderNumber: { type: String, required: true, unique: true },
     customer: { type: customerSummarySchema, required: true },
     items: [orderItemSchema],
@@ -37,7 +38,7 @@ const orderSchema = new mongoose.Schema(
     courier: { type: String, default: 'TCS_EXPRESS' },
     orderStatus: {
       type: String,
-      enum: ['PENDING_COD', 'IN_TRANSIT', 'DELIVERED', 'CANCELLED'],
+      enum: ['PENDING_COD', 'IN_TRANSIT', 'DELIVERED', 'CANCELLED', 'RETURNED'],
       default: 'PENDING_COD'
     }
   },

@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import Icon from '../../components/Icon.jsx';
+import { apiRequest } from '../../utils/api.js';
 
 export default function AdminOverview({ onNavigateToTab, onOpenProductDrawer }) {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch('/api/orders')
+    apiRequest('/api/orders')
       .then(res => res.json())
       .then(d => {
         if (d.success && Array.isArray(d.data)) setOrders(d.data);
       });
 
-    fetch('/api/products')
+    apiRequest('/api/products')
       .then(res => res.json())
       .then(d => {
         if (d.success && Array.isArray(d.data)) setProducts(d.data);
       });
   }, []);
 
-  const totalGrossRevenue = orders.reduce((sum, o) => sum + (Number(o.grossTotalPKR) || 0), 0);
+  const collectedRevenue = orders
+    .filter(order => order.orderStatus === 'DELIVERED')
+    .reduce((sum, order) => sum + (Number(order.grossTotalPKR) || 0), 0);
   const lowStockProducts = products.filter(p => p.stockQuantity <= 3);
 
   return (
@@ -31,7 +35,7 @@ export default function AdminOverview({ onNavigateToTab, onOpenProductDrawer }) 
             <span>/</span>
             <span>OVERVIEW</span>
             <span>/</span>
-            <span className="text-white font-bold">OPERATIONS PKT</span>
+            <span className="text-white font-bold">OPERATIONS</span>
           </div>
           <h1 className="font-['Space_Grotesk'] text-[24px] font-bold text-white tracking-tight uppercase">
             Mission Operations Dashboard
@@ -48,7 +52,7 @@ export default function AdminOverview({ onNavigateToTab, onOpenProductDrawer }) 
             onClick={onOpenProductDrawer}
             className="px-4 py-2 bg-white text-black hover:bg-neutral-200 text-[12px] font-['Space_Grotesk'] font-bold uppercase rounded-lg transition-colors cursor-pointer"
           >
-            + Add New Product
+            Add New Product
           </button>
         </div>
       </div>
@@ -58,16 +62,16 @@ export default function AdminOverview({ onNavigateToTab, onOpenProductDrawer }) 
         {/* Metric 1 */}
         <div className="bg-[#09090B] border border-[#27272A] p-5 rounded-xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-[#71717A] font-['Space_Grotesk'] text-[11px] font-bold uppercase">
-            <span>Gross Revenue (PKR)</span>
-            <span className="material-symbols-outlined text-[18px]">payments</span>
+            <span>Collected Revenue (PKR)</span>
+            <Icon className="text-[18px]">payments</Icon>
           </div>
           <div className="my-2">
             <span className="font-['Space_Grotesk'] text-[26px] font-bold text-white">
-              Rs. {totalGrossRevenue.toLocaleString()}
+              Rs. {collectedRevenue.toLocaleString()}
             </span>
           </div>
           <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A]">
-            All time verified transactions
+            Delivered orders only
           </span>
         </div>
 
@@ -75,7 +79,7 @@ export default function AdminOverview({ onNavigateToTab, onOpenProductDrawer }) 
         <div className="bg-[#09090B] border border-[#27272A] p-5 rounded-xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-[#71717A] font-['Space_Grotesk'] text-[11px] font-bold uppercase">
             <span>Total Orders Placed</span>
-            <span className="material-symbols-outlined text-[18px]">local_shipping</span>
+            <Icon className="text-[18px]">local_shipping</Icon>
           </div>
           <div className="my-2">
             <span className="font-['Space_Grotesk'] text-[26px] font-bold text-white">
@@ -91,7 +95,7 @@ export default function AdminOverview({ onNavigateToTab, onOpenProductDrawer }) 
         <div className="bg-[#09090B] border border-[#27272A] p-5 rounded-xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-[#71717A] font-['Space_Grotesk'] text-[11px] font-bold uppercase">
             <span>Active Catalog SKUs</span>
-            <span className="material-symbols-outlined text-[18px]">inventory_2</span>
+            <Icon className="text-[18px]">inventory_2</Icon>
           </div>
           <div className="my-2">
             <span className="font-['Space_Grotesk'] text-[26px] font-bold text-white">
@@ -99,7 +103,7 @@ export default function AdminOverview({ onNavigateToTab, onOpenProductDrawer }) 
             </span>
           </div>
           <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A]">
-            Allocable in database
+            Available in the store
           </span>
         </div>
 
@@ -107,7 +111,7 @@ export default function AdminOverview({ onNavigateToTab, onOpenProductDrawer }) 
         <div className="bg-[#09090B] border border-[#27272A] p-5 rounded-xl flex flex-col justify-between">
           <div className="flex items-center justify-between text-[#71717A] font-['Space_Grotesk'] text-[11px] font-bold uppercase">
             <span>Low Stock Items</span>
-            <span className="material-symbols-outlined text-[18px] text-yellow-500">warning</span>
+            <Icon className="text-[18px] text-yellow-500">warning</Icon>
           </div>
           <div className="my-2">
             <span className="font-['Space_Grotesk'] text-[26px] font-bold text-yellow-400">
@@ -124,7 +128,7 @@ export default function AdminOverview({ onNavigateToTab, onOpenProductDrawer }) 
       <div className="bg-[#09090B] border border-[#27272A] rounded-xl overflow-hidden shadow-lg flex flex-col">
         <div className="p-5 flex items-center justify-between border-b border-[#27272A]">
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-white text-[20px]">shopping_bag</span>
+            <Icon className="text-white text-[20px]">shopping_bag</Icon>
             <h3 className="font-['Space_Grotesk'] text-[16px] font-bold text-white uppercase">
               Recent Customer Orders
             </h3>
@@ -184,7 +188,7 @@ export default function AdminOverview({ onNavigateToTab, onOpenProductDrawer }) 
       {lowStockProducts.length > 0 && (
         <div className="bg-[#09090B] border border-[#27272A] rounded-xl p-5 flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-yellow-500 text-[20px]">warning</span>
+            <Icon className="text-yellow-500 text-[20px]">warning</Icon>
             <h3 className="font-['Space_Grotesk'] text-[15px] font-bold text-white uppercase">
               Critical Low Stock Thresholds ({lowStockProducts.length})
             </h3>

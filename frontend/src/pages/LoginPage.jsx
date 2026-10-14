@@ -1,24 +1,43 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
+import Icon from '../components/Icon.jsx';
 import Logo from '../components/Logo.jsx';
 
 export default function LoginPage({ onNavigate }) {
+  const { login, logout } = useAuth();
+  const location = useLocation();
+  const routerNavigate = useNavigate();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [loginSuccess, setLoginSuccess] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!identifier || !password) {
-      setErrorMsg('Please enter both your identifier and password');
+      setErrorMsg('Please enter your email and password.');
       return;
     }
     setErrorMsg('');
-    setLoginSuccess(true);
-    setTimeout(() => {
-      if (onNavigate) onNavigate('home');
-    }, 1500);
+    setLoginSuccess(false);
+
+    try {
+      const user = await login({ email: identifier.trim(), password });
+      const requestedPath = location.state?.from?.pathname;
+      if (requestedPath?.startsWith('/admin') && user.role !== 'admin') {
+        logout();
+        setErrorMsg('This account does not have administrator permission.');
+        return;
+      }
+
+      setLoginSuccess(true);
+      const destination = requestedPath || (user.role === 'admin' ? '/admin' : '/');
+      routerNavigate(destination, { replace: true });
+    } catch (error) {
+      setErrorMsg(error.message || 'Unable to sign in. Please try again.');
+    }
   };
 
   return (
@@ -41,7 +60,7 @@ export default function LoginPage({ onNavigate }) {
             onClick={() => onNavigate && onNavigate('home')}
             className="text-[12px] font-['Inter'] text-[#71717A] hover:text-black dark:hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            <Icon className="text-[16px]">arrow_back</Icon>
             <span>Storefront</span>
           </button>
         </div>
@@ -62,7 +81,7 @@ export default function LoginPage({ onNavigate }) {
 
           {errorMsg && (
             <div className="p-3 bg-red-100 dark:bg-[#93000A]/30 border border-red-300 dark:border-[#93000A] rounded-lg text-red-700 dark:text-white font-['Inter'] text-[12px] flex items-center gap-2">
-              <span className="material-symbols-outlined text-[16px] text-red-500">report_problem</span>
+              <Icon className="text-[16px] text-red-500">report_problem</Icon>
               <span>{errorMsg}</span>
             </div>
           )}
@@ -76,15 +95,15 @@ export default function LoginPage({ onNavigate }) {
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#71717A]">
-                Email or Mobile Phone *
+                Email Address *
               </label>
               <div className="relative flex items-center bg-[#F4F4F5] dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] rounded-lg">
-                <span className="material-symbols-outlined text-[#71717A] text-[18px] ml-3 shrink-0">badge</span>
+                <Icon className="text-[#71717A] text-[18px] ml-3 shrink-0">badge</Icon>
                 <input
                   type="text"
                   value={identifier}
                   onChange={e => setIdentifier(e.target.value)}
-                  placeholder="name@domain.pk or 0300-1234567"
+                  placeholder="name@domain.pk"
                   required
                   className="w-full bg-transparent px-3 py-2.5 font-['Inter'] text-[13px] text-black dark:text-white focus:outline-none"
                 />
@@ -101,7 +120,7 @@ export default function LoginPage({ onNavigate }) {
                 </a>
               </div>
               <div className="relative flex items-center bg-[#F4F4F5] dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] rounded-lg">
-                <span className="material-symbols-outlined text-[#71717A] text-[18px] ml-3 shrink-0">lock</span>
+                <Icon className="text-[#71717A] text-[18px] ml-3 shrink-0">lock</Icon>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -115,9 +134,7 @@ export default function LoginPage({ onNavigate }) {
                   onClick={() => setShowPassword(!showPassword)}
                   className="mr-3 text-[#71717A] hover:text-black dark:hover:text-white cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[18px]">
-                    {showPassword ? 'visibility_off' : 'visibility'}
-                  </span>
+                  <Icon className="text-[18px]">{showPassword ? 'visibility_off' : 'visibility'}</Icon>
                 </button>
               </div>
             </div>

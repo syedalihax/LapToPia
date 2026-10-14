@@ -1,33 +1,50 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
+import Icon from '../components/Icon.jsx';
 import Logo from '../components/Logo.jsx';
 
 export default function RegisterPage({ onNavigate }) {
+  const { register } = useAuth();
+  const routerNavigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    mobile: '',
     password: '',
     confirmPassword: ''
   });
-  const [registeredSuccess, setRegisteredSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const getStrength = (pass) => {
     if (!pass) return { label: 'EMPTY', color: 'bg-[#D4D4D8] dark:bg-[#27272A]', width: 'w-0' };
-    if (pass.length < 6) return { label: 'WEAK', color: 'bg-red-500', width: 'w-1/3' };
-    if (pass.length < 10) return { label: 'MEDIUM', color: 'bg-yellow-500', width: 'w-2/3' };
+    if (pass.length < 8) return { label: 'WEAK', color: 'bg-red-500', width: 'w-1/3' };
+    if (pass.length < 12) return { label: 'MEDIUM', color: 'bg-yellow-500', width: 'w-2/3' };
     return { label: 'STRONG', color: 'bg-black dark:bg-white', width: 'w-full' };
   };
 
   const strength = getStrength(formData.password);
   const passwordsMatch = formData.password && formData.password === formData.confirmPassword;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!passwordsMatch) return;
-    setRegisteredSuccess(true);
-    setTimeout(() => {
-      if (onNavigate) onNavigate('login');
-    }, 1500);
+    if (!passwordsMatch) {
+      setErrorMsg('Passwords do not match.');
+      return;
+    }
+
+    setErrorMsg('');
+    try {
+      await register({
+        name: formData.fullName.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+      });
+      routerNavigate('/profile', { replace: true, state: { promptAddress: true } });
+    } catch (error) {
+      setErrorMsg(error.message || 'Unable to create your account. Please try again.');
+    }
   };
 
   return (
@@ -50,7 +67,7 @@ export default function RegisterPage({ onNavigate }) {
             onClick={() => onNavigate && onNavigate('home')}
             className="text-[12px] font-['Inter'] text-[#71717A] hover:text-black dark:hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            <Icon className="text-[16px]">arrow_back</Icon>
             <span>Storefront</span>
           </button>
         </div>
@@ -62,16 +79,16 @@ export default function RegisterPage({ onNavigate }) {
               NEW PROFILE PROVISIONING
             </span>
             <h1 className="font-['Space_Grotesk'] text-[24px] font-bold text-black dark:text-white tracking-tight">
-              Create LAPTOPIA Account
+              Create Your Account
             </h1>
             <p className="font-['Inter'] text-[13px] text-[#71717A]">
-              Register to track nationwide COD shipments, save custom PC configurations, and manage hardware warranties.
+              Create an account to track orders, save your details, and manage your hardware warranties.
             </p>
           </div>
 
-          {registeredSuccess && (
-            <div className="p-3 bg-black text-white dark:bg-white dark:text-black font-['Space_Grotesk'] font-bold rounded-lg text-[13px] text-center">
-              Account Created Successfully! Redirecting to Sign In...
+          {errorMsg && (
+            <div role="alert" className="p-3 bg-red-100 dark:bg-[#93000A]/30 border border-red-300 dark:border-[#93000A] rounded-lg text-red-700 dark:text-white font-['Inter'] text-[12px]">
+              {errorMsg}
             </div>
           )}
 
@@ -80,42 +97,36 @@ export default function RegisterPage({ onNavigate }) {
               <label className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#71717A]">
                 Full Legal Name *
               </label>
-              <input
-                type="text"
-                value={formData.fullName}
-                onChange={e => setFormData({ ...formData, fullName: e.target.value })}
-                placeholder="e.g. Daniyal Tariq"
-                required
-                className="w-full bg-[#F4F4F5] dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] rounded-lg px-4 py-2.5 font-['Inter'] text-[13px] text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors"
-              />
+              <div className="flex items-center rounded-lg border border-[#E4E4E7] bg-[#F4F4F5] dark:border-[#27272A] dark:bg-[#18181B]">
+                <Icon className="ml-3 shrink-0 text-[18px] text-[#71717A]">person</Icon>
+                <input
+                  type="text"
+                  value={formData.fullName}
+                  onChange={e => setFormData({ ...formData, fullName: e.target.value })}
+                  placeholder="e.g. Daniyal Tariq"
+                  autoComplete="name"
+                  required
+                  className="w-full bg-transparent px-3 py-2.5 font-['Inter'] text-[13px] text-black focus:outline-none dark:text-white"
+                />
+              </div>
             </div>
 
             <div className="flex flex-col gap-1.5">
               <label className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#71717A]">
                 Email Address *
               </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={e => setFormData({ ...formData, email: e.target.value })}
-                placeholder="daniyal@example.pk"
-                required
-                className="w-full bg-[#F4F4F5] dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] rounded-lg px-4 py-2.5 font-['Inter'] text-[13px] text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#71717A]">
-                Mobile Contact (+92 SMS OTP) *
-              </label>
-              <input
-                type="tel"
-                value={formData.mobile}
-                onChange={e => setFormData({ ...formData, mobile: e.target.value })}
-                placeholder="+92 300 1234567"
-                required
-                className="w-full bg-[#F4F4F5] dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] rounded-lg px-4 py-2.5 font-['JetBrains_Mono'] text-[13px] text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors"
-              />
+              <div className="flex items-center rounded-lg border border-[#E4E4E7] bg-[#F4F4F5] dark:border-[#27272A] dark:bg-[#18181B]">
+                <Icon className="ml-3 shrink-0 text-[18px] text-[#71717A]">alternate_email</Icon>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={e => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="daniyal@example.pk"
+                  autoComplete="email"
+                  required
+                  className="w-full bg-transparent px-3 py-2.5 font-['Inter'] text-[13px] text-black focus:outline-none dark:text-white"
+                />
+              </div>
             </div>
 
             {/* Password */}
@@ -128,14 +139,22 @@ export default function RegisterPage({ onNavigate }) {
                   {strength.label}
                 </span>
               </div>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={e => setFormData({ ...formData, password: e.target.value })}
-                placeholder="••••••••••••"
-                required
-                className="w-full bg-[#F4F4F5] dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] rounded-lg px-4 py-2.5 font-['Inter'] text-[13px] text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors"
-              />
+              <div className="flex items-center rounded-lg border border-[#E4E4E7] bg-[#F4F4F5] dark:border-[#27272A] dark:bg-[#18181B]">
+                <Icon className="ml-3 shrink-0 text-[18px] text-[#71717A]">lock</Icon>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={e => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="••••••••••••"
+                  minLength={8}
+                  autoComplete="new-password"
+                  required
+                  className="w-full bg-transparent px-3 py-2.5 font-['Inter'] text-[13px] text-black focus:outline-none dark:text-white"
+                />
+                <button type="button" onClick={() => setShowPassword(value => !value)} aria-label={showPassword ? 'Hide password' : 'Show password'} className="mr-3 text-[#71717A] hover:text-black dark:hover:text-white">
+                  <Icon className="text-[18px]">{showPassword ? 'visibility_off' : 'visibility'}</Icon>
+                </button>
+              </div>
               <div className="w-full bg-[#E4E4E7] dark:bg-[#27272A] h-1 rounded-full overflow-hidden mt-1">
                 <div className={`h-full ${strength.color} ${strength.width} transition-all duration-300`}></div>
               </div>
@@ -153,14 +172,21 @@ export default function RegisterPage({ onNavigate }) {
                   </span>
                 )}
               </div>
-              <input
-                type="password"
-                value={formData.confirmPassword}
-                onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
-                placeholder="••••••••••••"
-                required
-                className="w-full bg-[#F4F4F5] dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] rounded-lg px-4 py-2.5 font-['Inter'] text-[13px] text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors"
-              />
+              <div className="flex items-center rounded-lg border border-[#E4E4E7] bg-[#F4F4F5] dark:border-[#27272A] dark:bg-[#18181B]">
+                <Icon className="ml-3 shrink-0 text-[18px] text-[#71717A]">lock</Icon>
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={formData.confirmPassword}
+                  onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  placeholder="••••••••••••"
+                  autoComplete="new-password"
+                  required
+                  className="w-full bg-transparent px-3 py-2.5 font-['Inter'] text-[13px] text-black focus:outline-none dark:text-white"
+                />
+                <button type="button" onClick={() => setShowConfirmPassword(value => !value)} aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'} className="mr-3 text-[#71717A] hover:text-black dark:hover:text-white">
+                  <Icon className="text-[18px]">{showConfirmPassword ? 'visibility_off' : 'visibility'}</Icon>
+                </button>
+              </div>
             </div>
 
             <button

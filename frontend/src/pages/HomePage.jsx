@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import Icon from '../components/Icon.jsx';
 import { useCart } from '../context/CartContext.jsx';
 
 export default function HomePage({ onNavigate }) {
   const { addToCart } = useCart();
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [categoryRecords, setCategoryRecords] = useState([]);
   const [activeTab, setActiveTab] = useState('all');
   const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
 
@@ -16,75 +18,82 @@ export default function HomePage({ onNavigate }) {
         }
       })
       .catch(err => console.error('Error fetching products:', err));
+
+    fetch('/api/categories')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.data)) setCategoryRecords(data.data);
+      })
+      .catch(err => console.error('Error fetching categories:', err));
   }, []);
 
   const heroSlides = [
     {
-      title: "NEXT-GEN HARDWARE ARCHITECTURE.",
-      tag: "PXN RACING × ROG ALLIANCE",
-      desc: "Equipped with NVIDIA GeForce RTX 4090, Intel Core 14th Gen & AMD Ryzen 7000 Series. Direct factory import with nationwide local warranty coverage across Pakistan.",
+      title: "LAPTOPS. PCS. SERVERS. MINERS.",
+      tag: "SYSTEMS FOR EVERY NEED",
+      desc: "Find complete systems for gaming, study, office work, everyday use, server workloads, and mining.",
       image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1600&q=80",
-      cta: "EXPLORE FLAGSHIP RIGS"
+      cta: "SHOP ALL SYSTEMS"
     },
     {
-      title: "CUSTOM HARDLINE LIQUID COOLING.",
-      tag: "ARCHITECT GRADE LAB PK",
-      desc: "Every bespoke build undergoes 48-hour synthetic stress benchmarking, thermal acoustic tuning, and laser-guided hard-tubing routing.",
+      title: "CHOOSE THE SYSTEM THAT FITS.",
+      tag: "GAMING • STUDENT • OFFICE • EVERYDAY",
+      desc: "Browse laptops and desktop PCs, or explore servers and dedicated mining machines.",
       image: "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=1600&q=80",
-      cta: "BOOK A BUILD CONSULTATION"
+      cta: "BROWSE CATEGORIES"
     }
   ];
 
-  const categories = [
+  const defaultCategories = [
     {
       id: 1,
-      num: "01 // PORTABLE COMPUTE",
-      title: "High-Performance Laptops",
-      desc: "ROG Strix, Lenovo Legion Pro, Razer Blade 16, Apple Silicon M3 Max.",
+      num: "01 // LAPTOPS",
+      title: "Laptops",
+      desc: "Gaming, student, office, and everyday laptops.",
       filter: "Laptops",
       image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80"
     },
     {
       id: 2,
-      num: "02 // GRAPHICS ACCELERATION",
-      title: "Graphics Cards & GPUs",
-      desc: "NVIDIA RTX 4080 Super, RTX 4090 24GB, AMD Radeon RX 7900 XTX.",
-      filter: "Components & GPUs",
-      image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      id: 3,
-      num: "03 // WORKSTATION & RIGS",
-      title: "Custom Gaming Rigs",
-      desc: "Hand-assembled, thermal benchmarked, custom water-cooled builds.",
-      filter: "Custom Rigs",
+      num: "02 // DESKTOP PCS",
+      title: "PC",
+      desc: "Desktop systems for gaming, study, office, and everyday use.",
+      filter: "PC",
       image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80"
     },
     {
-      id: 4,
-      num: "04 // SIMULATION LAB",
-      title: "Sim Racing & Pro Gear",
-      desc: "PXN, Moza, Fanatec Direct Drive bases, load cell brake systems.",
-      filter: "Sim Gear",
-      image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      id: 5,
-      num: "05 // ULTRA-HIGH REFRESH",
-      title: "OLED & Curved Monitors",
-      desc: "240Hz+ QD-OLED, Samsung Odyssey Neo G9, LG UltraGear 4K panels.",
-      filter: "Monitors",
-      image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80"
-    },
-    {
-      id: 6,
-      num: "06 // ENTERPRISE STACK",
-      title: "Enterprise & Storage",
-      desc: "10GbE MikroTik routing, Synology NAS, Gen5 enterprise NVMe.",
-      filter: "Enterprise",
+      id: 3,
+      num: "03 // SERVERS",
+      title: "Servers",
+      desc: "Systems for business, storage, and server workloads.",
+      filter: "Servers",
       image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      id: 4,
+      num: "04 // MINING SYSTEMS",
+      title: "Miner Machines",
+      desc: "Dedicated machines for cryptocurrency mining workloads.",
+      filter: "Miner Machines",
+      image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=800&q=80"
     }
   ];
+  const visibleCategoryRecords = categoryRecords.some(category => category.catalogMain)
+    ? categoryRecords.filter(category => category.catalogMain)
+    : categoryRecords;
+  const categories = visibleCategoryRecords.length
+    ? visibleCategoryRecords.map((category, index) => {
+      const template = defaultCategories.find(item => item.filter.toLowerCase() === (category.value || category.name).toLowerCase())
+        || defaultCategories[index % defaultCategories.length];
+      return {
+        ...template,
+        id: category.id,
+        title: category.name,
+        filter: category.value || category.name,
+        desc: category.subcategories?.map(subcategory => typeof subcategory === 'string' ? subcategory : subcategory.name).join(' · ') || `Browse ${category.name} in the LAPTOPIA catalog.`,
+      };
+    })
+    : defaultCategories;
 
   return (
     <div className="flex flex-col w-full bg-[#FAFAFA] dark:bg-[#09090B] text-[#09090B] dark:text-[#FAFAFA] transition-colors duration-200">
@@ -103,12 +112,12 @@ export default function HomePage({ onNavigate }) {
 
             {/* Hardware Identity Watermark */}
             <div className="absolute top-6 right-6 hidden md:flex items-center gap-3 bg-[#18181B]/80 backdrop-blur-md px-4 py-2 rounded-lg border border-[#3F3F46]">
-              <span className="material-symbols-outlined text-[20px] text-white">memory</span>
+              <Icon className="text-[20px] text-white">memory</Icon>
               <div className="flex flex-col">
-                <span className="font-['Space_Grotesk'] text-[11px] uppercase text-white font-bold tracking-wider">
-                  ARCHITECT GRADE
+                  <span className="font-['Space_Grotesk'] text-[11px] uppercase text-white font-bold tracking-wider">
+                  COMPLETE SYSTEMS
                 </span>
-                <span className="font-['JetBrains_Mono'] text-[10px] text-[#A1A1AA]">SERIES // 2025</span>
+                <span className="font-['JetBrains_Mono'] text-[10px] text-[#A1A1AA]">SHOP LAPTOPIA</span>
               </div>
             </div>
 
@@ -118,25 +127,25 @@ export default function HomePage({ onNavigate }) {
               className="absolute top-1/2 -translate-y-1/2 left-4 z-20 w-10 h-10 rounded-full bg-[#18181B]/80 hover:bg-white hover:text-black text-white flex items-center justify-center transition-colors border border-[#3F3F46] cursor-pointer"
               title="Previous"
             >
-              <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+              <Icon className="text-[20px]">chevron_left</Icon>
             </button>
             <button
               onClick={() => setCurrentHeroSlide(prev => (prev === heroSlides.length - 1 ? 0 : prev + 1))}
               className="absolute top-1/2 -translate-y-1/2 right-4 z-20 w-10 h-10 rounded-full bg-[#18181B]/80 hover:bg-white hover:text-black text-white flex items-center justify-center transition-colors border border-[#3F3F46] cursor-pointer"
               title="Next"
             >
-              <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+              <Icon className="text-[20px]">chevron_right</Icon>
             </button>
 
             {/* Content Overlay */}
             <div className="relative z-10 p-6 md:p-12 max-w-3xl flex flex-col gap-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 bg-[#18181B] border border-[#3F3F46] px-3 py-1 rounded font-['JetBrains_Mono'] text-[12px] text-white font-medium">
-                  <span className="material-symbols-outlined text-[14px] text-[#25D366]">verified</span>
+                  <Icon className="text-[14px] text-[#25D366]">computer</Icon>
                   {heroSlides[currentHeroSlide].tag}
                 </span>
                 <span className="bg-[#18181B] border border-[#3F3F46] px-3 py-1 rounded font-['JetBrains_Mono'] text-[12px] text-[#A1A1AA] uppercase">
-                  Factory Sealed PK Import
+                  Laptops · PCs · Servers · Miners
                 </span>
               </div>
 
@@ -154,14 +163,14 @@ export default function HomePage({ onNavigate }) {
                   className="inline-flex items-center gap-2 bg-white text-black hover:bg-neutral-200 transition-all px-6 py-3 rounded-lg font-['Space_Grotesk'] text-[12px] uppercase font-bold tracking-wider cursor-pointer"
                 >
                   <span>{heroSlides[currentHeroSlide].cta}</span>
-                  <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                  <Icon className="text-[16px]">arrow_forward</Icon>
                 </button>
                 <button
-                  onClick={() => onNavigate && onNavigate('catalog', { category: 'Components & GPUs' })}
+                  onClick={() => onNavigate && onNavigate('catalog', { category: 'PC' })}
                   className="inline-flex items-center gap-2 bg-[#18181B] hover:bg-[#27272A] border border-[#3F3F46] text-white transition-all px-6 py-3 rounded-lg font-['Space_Grotesk'] text-[12px] uppercase font-bold tracking-wider cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[16px]">tune</span>
-                  <span>CUSTOM PC BUILDER</span>
+                  <Icon className="text-[16px]">tune</Icon>
+                  <span>SHOP PCS</span>
                 </button>
               </div>
 
@@ -182,54 +191,20 @@ export default function HomePage({ onNavigate }) {
         </div>
       </section>
 
-      {/* Metric Quick Ribbon */}
-      <section className="w-full bg-[#F4F4F5] dark:bg-[#121215] border-y border-[#E4E4E7] dark:border-[#27272A] py-4 transition-colors">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-black dark:text-white text-[28px]">speed</span>
-            <div className="flex flex-col">
-              <span className="font-['Space_Grotesk'] text-[12px] font-bold text-black dark:text-white uppercase">24H DISPATCH</span>
-              <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A]">Express air courier across PK</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-black dark:text-white text-[28px]">lock</span>
-            <div className="flex flex-col">
-              <span className="font-['Space_Grotesk'] text-[12px] font-bold text-black dark:text-white uppercase">GENUINE SEALS</span>
-              <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A]">Unopened global stock</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-black dark:text-white text-[28px]">domain_verification</span>
-            <div className="flex flex-col">
-              <span className="font-['Space_Grotesk'] text-[12px] font-bold text-black dark:text-white uppercase">LOCAL WARRANTY</span>
-              <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A]">Direct service center support</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-[#25D366] text-[28px]">forum</span>
-            <div className="flex flex-col">
-              <span className="font-['Space_Grotesk'] text-[12px] font-bold text-black dark:text-white uppercase">WHATSAPP SUPPORT</span>
-              <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A]">Instant hardware guidance</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Category Grid (6 Premium Tiles) */}
+      {/* System Category Grid */}
       <section className="w-full py-16 bg-transparent">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 flex flex-col gap-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A] uppercase tracking-widest block mb-1">
-                CATALOG HIERARCHY
+                SHOP BY SYSTEM TYPE
               </span>
               <h2 className="font-['Space_Grotesk'] text-[28px] sm:text-[32px] text-black dark:text-white font-bold uppercase tracking-tight">
-                ENGINEERED CATEGORIES
+                LAPTOPS, PCS & MORE
               </h2>
             </div>
             <p className="font-['Inter'] text-[13px] text-[#71717A] max-w-md">
-              Precision selection filtered by enterprise validation, thermal thresholds, and authentic serial verification.
+              Shop laptops and PCs for gaming, study, office, and everyday use, plus servers and mining machines.
             </p>
           </div>
 
@@ -257,9 +232,7 @@ export default function HomePage({ onNavigate }) {
                   </p>
                   <div className="flex items-center gap-1 font-['Space_Grotesk'] text-[11px] font-bold uppercase text-white pt-2">
                     <span>EXPLORE PRODUCTS</span>
-                    <span className="material-symbols-outlined text-[16px] transition-transform group-hover:translate-x-1">
-                      arrow_forward
-                    </span>
+                    <Icon className="text-[16px] transition-transform group-hover:translate-x-1">arrow_forward</Icon>
                   </div>
                 </div>
               </button>
@@ -274,10 +247,10 @@ export default function HomePage({ onNavigate }) {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
               <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A] uppercase tracking-widest block mb-1">
-                VERIFIED FACTORY SHIPMENTS
+                LAPTOPIA STORE
               </span>
               <h2 className="font-['Space_Grotesk'] text-[28px] sm:text-[32px] text-black dark:text-white font-bold uppercase tracking-tight">
-                HARDWARE CATALOG & INVENTORY
+                AVAILABLE SYSTEMS
               </h2>
             </div>
 
@@ -291,34 +264,29 @@ export default function HomePage({ onNavigate }) {
               >
                 All Products ({featuredProducts.length})
               </button>
-              <button
-                onClick={() => setActiveTab('Laptops')}
-                className={`px-4 py-2 rounded font-['Space_Grotesk'] text-[11px] uppercase font-bold whitespace-nowrap transition-colors cursor-pointer ${
-                  activeTab === 'Laptops' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-[#71717A] hover:text-black dark:hover:text-white'
-                }`}
-              >
-                Laptops
-              </button>
-              <button
-                onClick={() => setActiveTab('Components & GPUs')}
-                className={`px-4 py-2 rounded font-['Space_Grotesk'] text-[11px] uppercase font-bold whitespace-nowrap transition-colors cursor-pointer ${
-                  activeTab === 'Components & GPUs' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-[#71717A] hover:text-black dark:hover:text-white'
-                }`}
-              >
-                GPUs & Hardware
-              </button>
+              {categories.map(category => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveTab(category.filter)}
+                  className={`px-4 py-2 rounded font-['Space_Grotesk'] text-[11px] uppercase font-bold whitespace-nowrap transition-colors cursor-pointer ${
+                    activeTab === category.filter ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-[#71717A] hover:text-black dark:hover:text-white'
+                  }`}
+                >
+                  {category.title}
+                </button>
+              ))}
             </div>
           </div>
 
           {/* Product Cards Grid */}
           {featuredProducts.length === 0 ? (
             <div className="p-12 rounded-xl bg-white dark:bg-[#09090B] border border-[#E4E4E7] dark:border-[#27272A] text-center flex flex-col items-center justify-center gap-3 shadow-sm">
-              <span className="material-symbols-outlined text-[36px] text-[#71717A]">inventory_2</span>
+              <Icon className="text-[36px] text-[#71717A]">inventory_2</Icon>
               <h3 className="font-['Space_Grotesk'] text-[18px] text-black dark:text-white font-bold">
-                Catalog Ready For Hardware Entry
+                No systems listed yet
               </h3>
               <p className="font-['Inter'] text-[13px] text-[#71717A] max-w-md">
-                As per your specification, zero placeholder items were loaded. You can list your genuine inventory items in the Admin Console and they will appear live here!
+                Products added to the store will appear here.
               </p>
             </div>
           ) : (
@@ -387,7 +355,7 @@ export default function HomePage({ onNavigate }) {
                           : 'bg-[#F4F4F5] dark:bg-[#18181B] text-[#71717A] cursor-not-allowed border border-[#E4E4E7] dark:border-[#27272A]'
                       }`}
                     >
-                      <span className="material-symbols-outlined text-[16px]">add_shopping_cart</span>
+                      <Icon className="text-[16px]">add_shopping_cart</Icon>
                       <span>{product.stockQuantity > 0 ? 'ADD TO CART' : 'OUT OF STOCK'}</span>
                     </button>
                   </div>
@@ -398,129 +366,6 @@ export default function HomePage({ onNavigate }) {
         </div>
       </section>
 
-      {/* GPU Benchmark Telemetry Lab */}
-      <section className="w-full py-16 bg-transparent">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 flex flex-col gap-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A] uppercase tracking-widest block mb-1">
-                TELEMETRY BENCHMARK LAB
-              </span>
-              <h2 className="font-['Space_Grotesk'] text-[28px] sm:text-[32px] text-black dark:text-white font-bold uppercase tracking-tight">
-                FLAGSHIP MOBILE GPU PERFORMANCE
-              </h2>
-            </div>
-            <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A]">
-              Test Config: 4K Ultra Render / Blender Cycle Engine
-            </span>
-          </div>
-
-          <div className="w-full bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] rounded-xl overflow-x-auto shadow-md">
-            <table className="w-full text-left font-['JetBrains_Mono'] text-[13px]">
-              <thead className="bg-[#F4F4F5] dark:bg-[#0E0E10] text-[#71717A] uppercase text-[11px]">
-                <tr>
-                  <th className="py-4 px-6">GPU Architecture</th>
-                  <th className="py-4 px-6">TGP Envelope</th>
-                  <th className="py-4 px-6">VRAM Buffer</th>
-                  <th className="py-4 px-6">Cyberpunk 4K RT</th>
-                  <th className="py-4 px-6">Blender Render</th>
-                  <th className="py-4 px-6 text-right">In-Stock Price</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E4E4E7] dark:divide-[#27272A] text-black dark:text-white">
-                <tr className="hover:bg-[#F4F4F5] dark:hover:bg-[#18181B] transition-colors">
-                  <td className="py-4 px-6 font-bold">NVIDIA GeForce RTX 4090 Mobile</td>
-                  <td className="py-4 px-6 text-[#71717A]">175W Max TGP</td>
-                  <td className="py-4 px-6 text-[#71717A]">16GB GDDR6X</td>
-                  <td className="py-4 px-6 font-bold">94 FPS</td>
-                  <td className="py-4 px-6 font-bold">8,210 pts</td>
-                  <td className="py-4 px-6 text-right font-['Space_Grotesk'] font-bold text-[16px]">Rs. 890,000+</td>
-                </tr>
-                <tr className="hover:bg-[#F4F4F5] dark:hover:bg-[#18181B] transition-colors">
-                  <td className="py-4 px-6 font-bold">NVIDIA GeForce RTX 4080 Mobile</td>
-                  <td className="py-4 px-6 text-[#71717A]">175W Max TGP</td>
-                  <td className="py-4 px-6 text-[#71717A]">12GB GDDR6</td>
-                  <td className="py-4 px-6 font-bold">78 FPS</td>
-                  <td className="py-4 px-6 font-bold">6,840 pts</td>
-                  <td className="py-4 px-6 text-right font-['Space_Grotesk'] font-bold text-[16px]">Rs. 680,000+</td>
-                </tr>
-                <tr className="hover:bg-[#F4F4F5] dark:hover:bg-[#18181B] transition-colors">
-                  <td className="py-4 px-6 font-bold">NVIDIA GeForce RTX 4070 Mobile</td>
-                  <td className="py-4 px-6 text-[#71717A]">140W Max TGP</td>
-                  <td className="py-4 px-6 text-[#71717A]">8GB GDDR6</td>
-                  <td className="py-4 px-6 font-bold">56 FPS</td>
-                  <td className="py-4 px-6 font-bold">4,910 pts</td>
-                  <td className="py-4 px-6 text-right font-['Space_Grotesk'] font-bold text-[16px]">Rs. 445,000+</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {/* Community Battlestations PK */}
-      <section className="w-full py-16 bg-[#F4F4F5] dark:bg-[#121215] border-t border-[#E4E4E7] dark:border-[#27272A] transition-colors">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 flex flex-col gap-10">
-          <div>
-            <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A] uppercase tracking-widest block mb-1">
-              #LAPTOPIABUILDS PK
-            </span>
-            <h2 className="font-['Space_Grotesk'] text-[28px] sm:text-[32px] text-black dark:text-white font-bold uppercase tracking-tight">
-              COMMUNITY BATTLESTATIONS
-            </h2>
-            <p className="font-['Inter'] text-[13px] text-[#71717A] mt-1">
-              Verified enthusiast setups delivered to power users in Karachi, Lahore, and Islamabad.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="h-80 rounded-xl overflow-hidden bg-black border border-[#E4E4E7] dark:border-[#27272A] p-6 flex flex-col justify-end relative shadow-lg">
-              <div
-                className="absolute inset-0 bg-cover bg-center opacity-40"
-                style={{ backgroundImage: `url('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80')` }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-              <div className="relative z-10">
-                <span className="font-['JetBrains_Mono'] text-[10px] text-[#25D366] font-bold uppercase block mb-1">
-                  DHA PHASE 8 // KARACHI
-                </span>
-                <h4 className="font-['Space_Grotesk'] text-[18px] text-white font-bold">Triple-Screen Sim Racing Cell</h4>
-                <span className="font-['JetBrains_Mono'] text-[11px] text-[#D4D4D8]">PXN Direct Drive Base • RTX 4090 Rig</span>
-              </div>
-            </div>
-
-            <div className="h-80 rounded-xl overflow-hidden bg-black border border-[#E4E4E7] dark:border-[#27272A] p-6 flex flex-col justify-end relative shadow-lg">
-              <div
-                className="absolute inset-0 bg-cover bg-center opacity-40"
-                style={{ backgroundImage: `url('https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80')` }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-              <div className="relative z-10">
-                <span className="font-['JetBrains_Mono'] text-[10px] text-[#25D366] font-bold uppercase block mb-1">
-                  GULBERG // LAHORE
-                </span>
-                <h4 className="font-['Space_Grotesk'] text-[18px] text-white font-bold">Stealth Black Unreal Lab</h4>
-                <span className="font-['JetBrains_Mono'] text-[11px] text-[#D4D4D8]">ROG SCAR 18 • 64GB DDR5 Workstation</span>
-              </div>
-            </div>
-
-            <div className="h-80 rounded-xl overflow-hidden bg-black border border-[#E4E4E7] dark:border-[#27272A] p-6 flex flex-col justify-end relative shadow-lg">
-              <div
-                className="absolute inset-0 bg-cover bg-center opacity-40"
-                style={{ backgroundImage: `url('https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=800&q=80')` }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-              <div className="relative z-10">
-                <span className="font-['JetBrains_Mono'] text-[10px] text-[#25D366] font-bold uppercase block mb-1">
-                  SECTOR F-7 // ISLAMABAD
-                </span>
-                <h4 className="font-['Space_Grotesk'] text-[18px] text-white font-bold">The Dual-OLED Architect Studio</h4>
-                <span className="font-['JetBrains_Mono'] text-[11px] text-[#D4D4D8]">RTX 4090 • Ryzen 9 7950X • 128GB DDR5</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

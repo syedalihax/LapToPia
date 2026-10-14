@@ -1,17 +1,36 @@
 import React, { useState, useEffect } from 'react';
+import Icon from '../../components/Icon.jsx';
+import { apiRequest } from '../../utils/api.js';
+
+const productFormSnapshot = values => JSON.stringify({
+  title: values.title,
+  description: values.description,
+  category: values.category,
+  subcategorySlug: values.subcategorySlug,
+  brand: values.brand,
+  pricePKR: values.pricePKR,
+  stockQuantity: values.stockQuantity,
+  sku: values.sku,
+  images: values.images,
+  specsText: values.specsText,
+});
 
 export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditProduct = null }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState('all');
+  const [categoryRecords, setCategoryRecords] = useState([]);
+  const [brandRecords, setBrandRecords] = useState([]);
 
   // Form State
   const [isDrawerOpen, setIsDrawerOpen] = useState(drawerOpen);
   const [editingProduct, setEditingProduct] = useState(null);
   const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Laptops');
-  const [brand, setBrand] = useState('ASUS ROG');
+  const [subcategorySlug, setSubcategorySlug] = useState('');
+  const [brand, setBrand] = useState('ASUS');
   const [pricePKR, setPricePKR] = useState('');
   const [stockQuantity, setStockQuantity] = useState('5');
   const [sku, setSku] = useState('');
@@ -19,10 +38,12 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
   const [specsText, setSpecsText] = useState('');
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [initialFormSnapshot, setInitialFormSnapshot] = useState('');
 
   const fetchProducts = () => {
     setLoading(true);
-    fetch('/api/products')
+    apiRequest('/api/products')
       .then(res => res.json())
       .then(d => {
         if (d.success && Array.isArray(d.data)) setProducts(d.data);
@@ -32,6 +53,13 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
 
   useEffect(() => {
     fetchProducts();
+    Promise.all([
+      apiRequest('/api/categories').then(response => response.json()),
+      apiRequest('/api/categories/brands').then(response => response.json()),
+    ]).then(([categoryData, brandData]) => {
+      if (categoryData.success && Array.isArray(categoryData.data)) setCategoryRecords(categoryData.data);
+      if (brandData.success && Array.isArray(brandData.data)) setBrandRecords(brandData.data);
+    }).catch(err => console.error('Failed to load product taxonomy:', err));
   }, []);
 
   useEffect(() => {
@@ -47,33 +75,48 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
   }, [drawerOpen, initialEditProduct]);
 
   const startNew = () => {
+    const newSku = `SKU-${Date.now().toString().slice(-6)}`;
+    setInitialFormSnapshot(productFormSnapshot({ title: '', description: '', category: 'Laptops', subcategorySlug: '', brand: 'ASUS', pricePKR: '', stockQuantity: '10', sku: newSku, images: [''], specsText: '' }));
     setEditingProduct(null);
     setTitle('');
+    setDescription('');
     setCategory('Laptops');
-    setBrand('ASUS ROG');
+    setSubcategorySlug('');
+    setBrand('ASUS');
     setPricePKR('');
     setStockQuantity('10');
-    setSku(`SKU-${Date.now().toString().slice(-6)}`);
-    setImages(['https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80']);
-    setSpecsText('i9-14900HX, RTX 4090 16GB, 64GB DDR5, 2TB NVMe');
+    setSku(newSku);
+    setImages(['']);
+    setSpecsText('');
     setFormError('');
     setIsDrawerOpen(true);
   };
 
   const startEdit = (prod) => {
+    const formValues = {
+      title: prod.title || '',
+      description: prod.description || '',
+      category: prod.category || 'Laptops',
+      subcategorySlug: prod.subcategorySlug || '',
+      brand: prod.brand || 'ASUS ROG',
+      pricePKR: (prod.pricePKR || '').toString(),
+      stockQuantity: prod.stockQuantity?.toString() || '0',
+      sku: prod.sku || '',
+      images: Array.isArray(prod.images) && prod.images.length > 0 ? [...prod.images] : [''],
+      specsText: Array.isArray(prod.specs) ? prod.specs.map(spec => (typeof spec === 'string' ? spec : spec.value)).join(', ') : '',
+    };
+    setInitialFormSnapshot(productFormSnapshot(formValues));
     setEditingProduct(prod);
-    setTitle(prod.title || '');
-    setCategory(prod.category || 'Laptops');
-    setBrand(prod.brand || 'ASUS ROG');
-    setPricePKR(prod.pricePKR || '');
-    setStockQuantity(prod.stockQuantity?.toString() || '0');
-    setSku(prod.sku || '');
-    setImages(Array.isArray(prod.images) && prod.images.length > 0 ? [...prod.images] : ['']);
-    setSpecsText(
-      Array.isArray(prod.specs)
-        ? prod.specs.map(s => (typeof s === 'string' ? s : s.value)).join(', ')
-        : ''
-    );
+    setTitle(formValues.title);
+    setDescription(formValues.description);
+    setCategory(formValues.category);
+    setSubcategorySlug(formValues.subcategorySlug);
+    setBrand(formValues.brand);
+    setPricePKR(formValues.pricePKR);
+    setStockQuantity(formValues.stockQuantity);
+    setSku(formValues.sku);
+    setImages(formValues.images);
+    setSpecsText(formValues.specsText);
     setFormError('');
     setIsDrawerOpen(true);
   };
@@ -93,6 +136,34 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
   const removeImageField = (index) => {
     if (images.length > 1) {
       setImages(images.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleImageUpload = async (event) => {
+    const files = Array.from(event.target.files || []);
+    event.target.value = '';
+    if (!files.length) return;
+
+    const currentImages = images.filter(Boolean);
+    if (currentImages.length + files.length > 5) {
+      setFormError('Maximum 5 images allowed per product');
+      return;
+    }
+
+    setUploadingImages(true);
+    setFormError('');
+    try {
+      const formData = new FormData();
+      files.forEach(file => formData.append('images', file));
+      const response = await apiRequest('/api/products/images', { method: 'POST', body: formData });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || 'Image upload failed');
+      const uploadedUrls = data.data.map(image => image.url);
+      setImages([...currentImages, ...uploadedUrls]);
+    } catch (error) {
+      setFormError(error.message || 'Could not upload images');
+    } finally {
+      setUploadingImages(false);
     }
   };
 
@@ -126,7 +197,9 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
     try {
       const payload = {
         title,
+        description,
         category,
+        subcategorySlug,
         brand,
         pricePKR: Number(pricePKR),
         stockQuantity: Number(stockQuantity),
@@ -138,7 +211,7 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
       const url = editingProduct ? `/api/products/${editingProduct.id}` : '/api/products';
       const method = editingProduct ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
+      const res = await apiRequest(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -162,7 +235,7 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
   const handleDeleteProduct = async (id, prodTitle) => {
     if (!confirm(`Are you sure you want to delete ${prodTitle} from inventory?`)) return;
     try {
-      const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+      const res = await apiRequest(`/api/products/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         fetchProducts();
@@ -177,6 +250,10 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
     const matchSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase()) || p.sku?.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
+  const selectedCategory = categoryRecords.find(item => (item.value || item.name) === category);
+  const subcategoryOptions = selectedCategory?.subcategories || [];
+  const currentFormSnapshot = productFormSnapshot({ title, description, category, subcategorySlug, brand, pricePKR, stockQuantity, sku, images, specsText });
+  const hasProductChanges = currentFormSnapshot !== initialFormSnapshot;
 
   return (
     <div className="p-8 max-w-[1440px] mx-auto w-full flex flex-col gap-8">
@@ -184,7 +261,7 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A] uppercase tracking-wider block mb-1">
-            INVENTORY ENGINE // MERN PERSISTENCE
+            INVENTORY MANAGEMENT
           </span>
           <h1 className="font-['Space_Grotesk'] text-[28px] font-bold text-white tracking-tight uppercase">
             Products & Inventory Management
@@ -198,7 +275,7 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
           onClick={startNew}
           className="px-4 py-2.5 bg-white text-black hover:bg-neutral-200 font-['Space_Grotesk'] text-[12px] font-bold uppercase rounded-lg flex items-center gap-2 transition-colors cursor-pointer"
         >
-          <span className="material-symbols-outlined text-[18px]">add</span>
+          <Icon className="text-[18px]">add</Icon>
           <span>Add New Product</span>
         </button>
       </div>
@@ -206,7 +283,7 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
       {/* Toolbar */}
       <div className="bg-[#09090B] border border-[#27272A] p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative flex-1 w-full max-w-md">
-          <span className="material-symbols-outlined absolute left-3 top-2.5 text-[#71717A] text-[18px]">search</span>
+          <Icon className="absolute left-3 top-2.5 text-[#71717A] text-[18px]">search</Icon>
           <input
             type="text"
             value={search}
@@ -223,11 +300,7 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
             className="bg-[#18181B] border border-[#27272A] text-white text-[12px] font-['JetBrains_Mono'] px-3 py-2 rounded-lg focus:outline-none cursor-pointer"
           >
             <option value="all">All Categories</option>
-            <option value="Laptops">Laptops</option>
-            <option value="Components & GPUs">Components & GPUs</option>
-            <option value="Custom Rigs">Custom Rigs</option>
-            <option value="Monitors">Monitors</option>
-            <option value="Sim Gear">Sim Gear</option>
+            {categoryRecords.map(item => <option key={item.id} value={item.value || item.name}>{item.name}</option>)}
           </select>
         </div>
       </div>
@@ -240,7 +313,7 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-16 text-center flex flex-col items-center justify-center gap-3">
-            <span className="material-symbols-outlined text-[42px] text-[#71717A]">inventory_2</span>
+            <Icon className="text-[42px] text-[#71717A]">inventory_2</Icon>
             <h3 className="font-['Space_Grotesk'] text-[18px] font-bold text-white">No Products in Inventory</h3>
             <p className="font-['Inter'] text-[13px] text-[#71717A] max-w-md">
               Start by clicking the "Add New Product" button above to list hardware items with 1 to 5 images.
@@ -300,14 +373,14 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                           className="p-1.5 rounded hover:bg-[#18181B] text-[#A1A1AA] hover:text-white transition-colors cursor-pointer"
                           title="Edit Product"
                         >
-                          <span className="material-symbols-outlined text-[18px]">edit</span>
+                          <Icon className="text-[18px]">edit</Icon>
                         </button>
                         <button
                           onClick={() => handleDeleteProduct(p.id, p.title)}
                           className="p-1.5 rounded hover:bg-[#18181B] text-red-400 hover:text-red-300 transition-colors cursor-pointer"
                           title="Delete Product"
                         >
-                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                          <Icon className="text-[18px]">delete</Icon>
                         </button>
                       </div>
                     </td>
@@ -339,13 +412,13 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                 }}
                 className="p-1.5 text-[#71717A] hover:text-white rounded hover:bg-[#18181B] cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[20px]">close</span>
+                <Icon className="text-[20px]">close</Icon>
               </button>
             </div>
 
             {formError && (
               <div className="p-3 bg-[#93000A]/40 border border-[#93000A] rounded-lg text-white font-['Inter'] text-[12px] flex items-center gap-2">
-                <span className="material-symbols-outlined text-[16px] text-red-400">error</span>
+                <Icon className="text-[16px] text-red-400">error</Icon>
                 <span>{formError}</span>
               </div>
             )}
@@ -365,6 +438,11 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                 />
               </div>
 
+              <label className="flex flex-col gap-1.5">
+                <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#A1A1AA]">Description</span>
+                <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} className="w-full resize-y rounded-lg border border-[#27272A] bg-[#18181B] px-3.5 py-2.5 font-['Inter'] text-[13px] text-white focus:border-white focus:outline-none" placeholder="Product information; avoid unverified specifications." />
+              </label>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#A1A1AA]">
@@ -372,15 +450,19 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                   </label>
                   <select
                     value={category}
-                    onChange={e => setCategory(e.target.value)}
+                    onChange={e => { setCategory(e.target.value); setSubcategorySlug(''); }}
                     className="w-full bg-[#18181B] border border-[#27272A] rounded-lg px-3 py-2 font-['Inter'] text-[13px] text-white focus:outline-none cursor-pointer"
                   >
-                    <option value="Laptops">Laptops</option>
-                    <option value="Components & GPUs">Components & GPUs</option>
-                    <option value="Custom Rigs">Custom Rigs</option>
-                    <option value="Monitors">Monitors</option>
-                    <option value="Sim Gear">Sim Gear</option>
-                    <option value="Enterprise">Enterprise</option>
+                    {categoryRecords.map(item => <option key={item.id} value={item.value || item.name}>{item.name}</option>)}
+                    {!categoryRecords.some(item => (item.value || item.name) === category) && <option value={category}>{category}</option>}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#A1A1AA]">Subcategory</label>
+                  <select value={subcategorySlug} onChange={e => setSubcategorySlug(e.target.value)} className="w-full rounded-lg border border-[#27272A] bg-[#18181B] px-3 py-2 font-['Inter'] text-[13px] text-white focus:outline-none">
+                    <option value="">Select subcategory (optional)</option>
+                    {subcategoryOptions.map(item => <option key={typeof item === 'string' ? item : item.slug} value={typeof item === 'string' ? item : item.slug}>{typeof item === 'string' ? item : item.name}</option>)}
                   </select>
                 </div>
 
@@ -388,13 +470,14 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                   <label className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#A1A1AA]">
                     Brand Partner
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={brand}
                     onChange={e => setBrand(e.target.value)}
-                    placeholder="e.g. ASUS ROG, MSI, Razer"
                     className="w-full bg-[#18181B] border border-[#27272A] rounded-lg px-3.5 py-2 font-['Inter'] text-[13px] text-white focus:outline-none focus:border-white"
-                  />
+                  >
+                    {brandRecords.filter(item => item.managed !== false).map(item => <option key={item.id} value={item.name}>{item.name}</option>)}
+                    {!brandRecords.some(item => item.name === brand) && <option value={brand}>{brand} (existing)</option>}
+                  </select>
                 </div>
               </div>
 
@@ -405,6 +488,8 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                   </label>
                   <input
                     type="number"
+                    min="0.01"
+                    step="0.01"
                     value={pricePKR}
                     onChange={e => setPricePKR(e.target.value)}
                     placeholder="e.g. 985000"
@@ -419,6 +504,8 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                   </label>
                   <input
                     type="number"
+                    min="0"
+                    step="1"
                     value={stockQuantity}
                     onChange={e => setStockQuantity(e.target.value)}
                     placeholder="e.g. 10"
@@ -439,6 +526,19 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                   </span>
                 </div>
 
+                <label className="flex flex-col gap-1.5 text-[12px] text-[#A1A1AA]">
+                  Upload images to Cloudinary (up to 5 MB each)
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    disabled={uploadingImages || images.filter(Boolean).length >= 5}
+                    onChange={handleImageUpload}
+                    className="w-full rounded-lg border border-[#27272A] bg-[#18181B] p-2 text-white file:mr-3 file:rounded file:border-0 file:bg-white file:px-3 file:py-1.5 file:text-black disabled:opacity-50"
+                  />
+                  {uploadingImages && <span>Uploading images...</span>}
+                </label>
+
                 <div className="flex flex-col gap-2.5">
                   {images.map((img, idx) => (
                     <div key={idx} className="flex items-center gap-2">
@@ -446,7 +546,7 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                         {img ? (
                           <img src={img} alt="" className="w-full h-full object-contain" />
                         ) : (
-                          <span className="material-symbols-outlined text-[16px] text-[#71717A]">image</span>
+                          <Icon className="text-[16px] text-[#71717A]">image</Icon>
                         )}
                       </div>
                       <input
@@ -463,7 +563,7 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                           onClick={() => removeImageField(idx)}
                           className="p-1.5 text-red-400 hover:text-red-300 cursor-pointer"
                         >
-                          <span className="material-symbols-outlined text-[18px]">remove_circle</span>
+                          <Icon className="text-[18px]">remove_circle</Icon>
                         </button>
                       )}
                     </div>
@@ -476,7 +576,7 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                     onClick={addImageField}
                     className="self-start text-[11px] font-['Space_Grotesk'] text-white hover:underline uppercase font-bold flex items-center gap-1 mt-1 cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[16px]">add</span>
+                    <Icon className="text-[16px]">add</Icon>
                     <span>+ Add Another Image Slot ({images.length}/5)</span>
                   </button>
                 )}
@@ -491,7 +591,7 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                   rows={2}
                   value={specsText}
                   onChange={e => setSpecsText(e.target.value)}
-                  placeholder="e.g. i9-14900HX, RTX 4090 16GB, 64GB DDR5, 2TB NVMe"
+                  placeholder="e.g. CPU, memory, storage, graphics"
                   className="w-full bg-[#18181B] border border-[#27272A] rounded-lg p-3 font-['JetBrains_Mono'] text-[12px] text-white focus:outline-none focus:border-white resize-none"
                 />
               </div>
@@ -508,13 +608,13 @@ export default function AdminProducts({ drawerOpen, onCloseDrawer, initialEditPr
                 >
                   Cancel
                 </button>
-                <button
+                {hasProductChanges && <button
                   type="submit"
                   disabled={saving}
                   className="flex-1 py-3 rounded-lg bg-white hover:bg-neutral-200 text-black font-['Space_Grotesk'] text-[12px] font-bold uppercase cursor-pointer"
                 >
-                  {saving ? 'Saving...' : 'Commit Changes'}
-                </button>
+                  {saving ? 'Saving…' : 'Save'}
+                </button>}
               </div>
             </form>
           </div>

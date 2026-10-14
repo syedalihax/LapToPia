@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import Icon from '../../components/Icon.jsx';
 import InvoiceModal from '../../components/InvoiceModal.jsx';
+import { apiRequest } from '../../utils/api.js';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
+  const [statusError, setStatusError] = useState('');
 
   const fetchOrders = () => {
     setLoading(true);
-    fetch('/api/orders')
+    apiRequest('/api/orders')
       .then(res => res.json())
       .then(d => {
         if (d.success && Array.isArray(d.data)) setOrders(d.data);
@@ -23,24 +26,27 @@ export default function AdminOrders() {
 
   const handleStatusChange = async (orderId, newStatus) => {
     setUpdatingId(orderId);
+    setStatusError('');
     try {
-      const res = await fetch(`/api/orders/${orderId}/status`, {
+      const res = await apiRequest(`/api/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
       });
       const data = await res.json();
-      if (data.success) {
+      if (res.ok && data.success) {
         setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, orderStatus: newStatus } : o)));
+      } else {
+        setStatusError(data.error || 'Could not update this order status.');
       }
     } catch (err) {
-      console.error('Error updating status:', err);
+      setStatusError(err.message || 'Could not update this order status.');
     } finally {
       setUpdatingId(null);
     }
   };
 
-  const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.grossTotalPKR) || 0), 0);
+  const totalRevenue = orders.filter(o => o.orderStatus === 'DELIVERED').reduce((sum, o) => sum + (Number(o.grossTotalPKR) || 0), 0);
   const inTransitCount = orders.filter(o => o.orderStatus === 'IN_TRANSIT').length;
   const pendingCount = orders.filter(o => o.orderStatus === 'PENDING_COD').length;
 
@@ -64,7 +70,7 @@ export default function AdminOrders() {
           onClick={fetchOrders}
           className="px-4 py-2 bg-[#121215] hover:bg-[#18181B] border border-[#27272A] text-white font-['Space_Grotesk'] text-[12px] font-bold uppercase rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
         >
-          <span className="material-symbols-outlined text-[16px]">sync</span>
+          <Icon className="text-[16px]">sync</Icon>
           <span>Refresh Orders</span>
         </button>
       </div>
@@ -80,13 +86,13 @@ export default function AdminOrders() {
         </div>
 
         <div className="bg-[#09090B] border border-[#27272A] p-5 rounded-xl flex flex-col justify-between">
-          <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#71717A] uppercase">Gross Revenue</span>
+          <span className="font-['Space_Grotesk'] text-[11px] font-bold text-[#71717A] uppercase">Collected Revenue</span>
           <div className="my-2">
             <span className="font-['Space_Grotesk'] text-[26px] font-bold text-white">
               Rs. {totalRevenue.toLocaleString()}
             </span>
           </div>
-          <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A]">COD Ledger Volume</span>
+          <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A]">Delivered orders only</span>
         </div>
 
         <div className="bg-[#09090B] border border-[#27272A] p-5 rounded-xl flex flex-col justify-between">
@@ -107,6 +113,7 @@ export default function AdminOrders() {
       </div>
 
       {/* Orders Table */}
+      {statusError && <div role="alert" className="rounded-lg border border-red-800 bg-red-950/50 p-3 text-sm text-red-200">{statusError}</div>}
       <div className="bg-[#09090B] border border-[#27272A] rounded-xl overflow-hidden shadow-xl flex flex-col">
         {loading ? (
           <div className="p-16 text-center text-[#71717A] font-['JetBrains_Mono'] text-[13px]">
@@ -114,7 +121,7 @@ export default function AdminOrders() {
           </div>
         ) : orders.length === 0 ? (
           <div className="p-16 text-center flex flex-col items-center justify-center gap-3">
-            <span className="material-symbols-outlined text-[42px] text-[#71717A]">local_shipping</span>
+            <Icon className="text-[42px] text-[#71717A]">local_shipping</Icon>
             <h3 className="font-['Space_Grotesk'] text-[18px] font-bold text-white">No Orders Placed Yet</h3>
             <p className="font-['Inter'] text-[13px] text-[#71717A] max-w-md">
               When customers checkout with Cash on Delivery on the storefront, their order manifest will appear here with live status modification controls.
@@ -165,6 +172,8 @@ export default function AdminOrders() {
                             ? 'border-yellow-500 text-yellow-400'
                             : order.orderStatus === 'CANCELLED'
                             ? 'border-red-500 text-red-400'
+                            : order.orderStatus === 'RETURNED'
+                            ? 'border-purple-500 text-purple-300'
                             : 'border-[#3F3F46] text-white'
                         }`}
                       >
@@ -172,6 +181,7 @@ export default function AdminOrders() {
                         <option value="IN_TRANSIT">In Transit (TCS)</option>
                         <option value="DELIVERED">Delivered & Collected</option>
                         <option value="CANCELLED">Cancelled</option>
+                        <option value="RETURNED">Returned</option>
                       </select>
                     </td>
                     <td className="py-3.5 px-5 text-center">
@@ -180,7 +190,7 @@ export default function AdminOrders() {
                         className="p-1.5 rounded hover:bg-[#18181B] text-white transition-colors cursor-pointer"
                         title="Print / View Invoice"
                       >
-                        <span className="material-symbols-outlined text-[18px]">receipt_long</span>
+                        <Icon className="text-[18px]">receipt_long</Icon>
                       </button>
                     </td>
                   </tr>

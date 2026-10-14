@@ -1,11 +1,21 @@
 import mongoose from 'mongoose';
 
+const subcategorySchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    slug: { type: String, required: true, trim: true, lowercase: true },
+  },
+  { _id: false }
+);
+
 const categorySchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true, trim: true },
+    value: { type: String, required: true, trim: true },
     icon: { type: String, default: 'category' },
-    subcategories: [{ type: String, trim: true }]
+    catalogMain: { type: Boolean, default: false },
+    subcategories: [subcategorySchema]
   },
   { timestamps: true }
 );

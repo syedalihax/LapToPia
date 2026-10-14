@@ -1,8 +1,11 @@
 import React from 'react';
+import Icon from '../components/Icon.jsx';
 import { useCart } from '../context/CartContext.jsx';
+import { useStoreSettings } from '../context/StoreSettingsContext.jsx';
 
 export default function CartPage({ onNavigate }) {
   const { cartItems, removeFromCart, updateQty, clearCart, totalItems, grossTotalPKR } = useCart();
+  const settings = useStoreSettings();
 
   if (cartItems.length === 0) {
     return (
@@ -10,20 +13,20 @@ export default function CartPage({ onNavigate }) {
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 flex flex-col items-center justify-center text-center">
           <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] rounded-2xl p-12 max-w-lg w-full flex flex-col items-center shadow-md">
             <div className="w-16 h-16 rounded-full bg-[#F4F4F5] dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] flex items-center justify-center text-[#71717A] mb-4">
-              <span className="material-symbols-outlined text-[32px]">production_quantity_limits</span>
+              <Icon className="text-[32px]">production_quantity_limits</Icon>
             </div>
             <h2 className="font-['Space_Grotesk'] text-[24px] font-bold text-black dark:text-white uppercase tracking-tight">
               Your Cart is Currently Empty
             </h2>
             <p className="font-['Inter'] text-[13px] text-[#71717A] mt-2 mb-6 leading-relaxed">
-              Looks like you haven't added any bench-tested laptops, GPUs, or enterprise workstations to your order queue yet.
+              Your cart is empty. Browse laptops, PCs, servers, and mining machines to find a system.
             </p>
             <button
               onClick={() => onNavigate && onNavigate('catalog')}
               className="bg-black text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 px-8 py-3.5 rounded-lg font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-2 cursor-pointer"
             >
               <span>Explore Hardware Catalog</span>
-              <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              <Icon className="text-[16px]">arrow_forward</Icon>
             </button>
           </div>
         </div>
@@ -54,7 +57,7 @@ export default function CartPage({ onNavigate }) {
             </p>
           </div>
           <div className="flex items-center gap-2 font-['JetBrains_Mono'] text-[11px] text-black dark:text-[#FAFAFA] bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] px-3 py-1.5 rounded-lg shadow-sm">
-            <span>LAB DISPATCH LOCK: ACTIVE</span>
+              <span>READY WHEN YOU ARE</span>
           </div>
         </div>
 
@@ -107,7 +110,7 @@ export default function CartPage({ onNavigate }) {
                               onClick={() => removeFromCart(item.productId, item.variant)}
                               className="inline-flex items-center gap-1 font-['Inter'] text-[12px] text-[#71717A] hover:text-black dark:hover:text-white transition-colors cursor-pointer"
                             >
-                              <span className="material-symbols-outlined text-[15px]">delete_outline</span>
+                              <Icon className="text-[15px]">delete_outline</Icon>
                               <span>Remove</span>
                             </button>
                           </div>
@@ -126,7 +129,7 @@ export default function CartPage({ onNavigate }) {
                             onClick={() => updateQty(item.productId, item.variant, -1)}
                             className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-[#121215] hover:bg-neutral-100 dark:hover:bg-[#27272A] text-black dark:text-white transition-colors cursor-pointer"
                           >
-                            <span className="material-symbols-outlined text-[14px]">remove</span>
+                            <Icon className="text-[14px]">remove</Icon>
                           </button>
                           <span className="w-8 text-center font-['JetBrains_Mono'] text-[12px] font-bold text-black dark:text-white">
                             {item.qty}
@@ -135,7 +138,7 @@ export default function CartPage({ onNavigate }) {
                             onClick={() => updateQty(item.productId, item.variant, 1)}
                             className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-[#121215] hover:bg-neutral-100 dark:hover:bg-[#27272A] text-black dark:text-white transition-colors cursor-pointer"
                           >
-                            <span className="material-symbols-outlined text-[14px]">add</span>
+                            <Icon className="text-[14px]">add</Icon>
                           </button>
                         </div>
                       </div>
@@ -156,14 +159,14 @@ export default function CartPage({ onNavigate }) {
                 onClick={() => onNavigate && onNavigate('catalog')}
                 className="inline-flex items-center gap-1 text-[13px] text-[#71717A] hover:text-black dark:hover:text-white transition-colors font-['Inter'] cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+                <Icon className="text-[18px]">arrow_back</Icon>
                 <span>Continue Shopping</span>
               </button>
               <button
                 onClick={clearCart}
                 className="inline-flex items-center gap-1 text-[13px] text-[#71717A] hover:text-black dark:hover:text-white transition-colors font-['Inter'] cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[16px]">remove_shopping_cart</span>
+                <Icon className="text-[16px]">remove_shopping_cart</Icon>
                 <span>Clear Cart</span>
               </button>
             </div>
@@ -216,25 +219,25 @@ export default function CartPage({ onNavigate }) {
                 onClick={() => onNavigate && onNavigate('checkout')}
                 className="w-full bg-black text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 py-3.5 px-6 rounded-lg font-['Space_Grotesk'] text-[13px] font-bold tracking-wider uppercase flex items-center justify-center gap-2 shadow-md transition-colors cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[18px]">lock</span>
+                <Icon className="text-[18px]">lock</Icon>
                 <span>Proceed to Checkout</span>
-                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                <Icon className="text-[16px]">arrow_forward</Icon>
               </button>
 
               {/* Direct WhatsApp Verification */}
               <a
-                href="https://wa.me/923000000000"
+                href={`https://wa.me/${(settings.whatsappPhone || '').replace(/\D/g, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-[#25D366] py-2.5 px-4 rounded-lg font-['JetBrains_Mono'] text-[12px] text-center flex items-center justify-center gap-2 transition-colors"
               >
-                <span className="material-symbols-outlined text-[16px]">chat</span>
+                <Icon className="text-[16px]">chat</Icon>
                 <span>Instant Desk Verification via WhatsApp</span>
               </a>
 
               {/* Security terms */}
               <div className="bg-[#F4F4F5] dark:bg-[#18181B] p-3 rounded-lg border border-[#E4E4E7] dark:border-[#27272A] flex items-start gap-2 text-[#71717A] text-[11px] font-['JetBrains_Mono']">
-                <span className="material-symbols-outlined text-[16px] text-black dark:text-white shrink-0 mt-0.5">verified_user</span>
+                <Icon className="text-[16px] text-black dark:text-white shrink-0 mt-0.5">verified_user</Icon>
                 <p>Cash on Delivery: Inspect physical seals upon courier handover before paying cash.</p>
               </div>
             </div>

@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+import Icon from '../components/Icon.jsx';
+import { useStoreSettings } from '../context/StoreSettingsContext.jsx';
 
 export default function SupportPage({ onNavigate }) {
+  const settings = useStoreSettings();
+  const whatsappLink = `https://wa.me/${(settings.whatsappPhone || '').replace(/\D/g, '')}`;
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -53,10 +57,10 @@ export default function SupportPage({ onNavigate }) {
             CLIENT CONCIERGE & ENTERPRISE RMA
           </span>
           <h1 className="font-['Space_Grotesk'] text-[32px] sm:text-[42px] font-bold text-black dark:text-white uppercase tracking-tight">
-            Contact LAPTOPIA
+            Contact {settings.storeName}
           </h1>
           <p className="font-['Inter'] text-[14px] text-[#71717A] leading-relaxed">
-            Direct technical assistance, order tracking verification, and warranty inquiries. Reach out to our dedicated hardware specialist team stationed at our Lahore & Karachi tech hubs.
+            Direct technical assistance, order tracking verification, and warranty inquiries. Contact our team using the current phone, email, and facility details below.
           </p>
         </div>
 
@@ -66,15 +70,15 @@ export default function SupportPage({ onNavigate }) {
           <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] p-6 rounded-xl flex flex-col justify-between shadow-sm">
             <div>
               <div className="w-10 h-10 rounded-lg bg-[#F4F4F5] dark:bg-[#18181B] flex items-center justify-center text-black dark:text-white mb-4">
-                <span className="material-symbols-outlined text-[20px]">call</span>
+                <Icon className="text-[20px]">call</Icon>
               </div>
               <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#71717A] tracking-wider block mb-1">
                 Direct Helpline
               </span>
-              <a href="tel:+923000000000" className="font-['Space_Grotesk'] text-[18px] font-bold text-black dark:text-white hover:underline block mb-1">
-                +92 300 0000000
+              <a href={`tel:${settings.supportPhone}`} className="font-['Space_Grotesk'] text-[18px] font-bold text-black dark:text-white hover:underline block mb-1">
+                {settings.supportPhone}
               </a>
-              <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A] block">(042) 35789120</span>
+              <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A] block">Call our support team</span>
             </div>
             <div className="mt-4 pt-3 border-t border-[#E4E4E7] dark:border-[#27272A] font-['Inter'] text-[12px] text-[#71717A]">
               Mon – Sat: 11:00 AM – 9:00 PM PKT
@@ -85,15 +89,15 @@ export default function SupportPage({ onNavigate }) {
           <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] p-6 rounded-xl flex flex-col justify-between shadow-sm">
             <div>
               <div className="w-10 h-10 rounded-lg bg-[#F4F4F5] dark:bg-[#18181B] flex items-center justify-center text-black dark:text-white mb-4">
-                <span className="material-symbols-outlined text-[20px]">alternate_email</span>
+                <Icon className="text-[20px]">alternate_email</Icon>
               </div>
               <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#71717A] tracking-wider block mb-1">
                 Official Electronic Mail
               </span>
-              <a href="mailto:orders@laptops.pk" className="font-['Space_Grotesk'] text-[16px] font-bold text-black dark:text-white hover:underline block truncate mb-1">
-                orders@laptops.pk
+              <a href={`mailto:${settings.supportEmail}`} className="font-['Space_Grotesk'] text-[16px] font-bold text-black dark:text-white hover:underline block truncate mb-1">
+                {settings.supportEmail}
               </a>
-              <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A] block">claims@laptops.pk</span>
+              <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A] block">Official support email</span>
             </div>
             <div className="mt-4 pt-3 border-t border-[#E4E4E7] dark:border-[#27272A] font-['Inter'] text-[12px] text-[#71717A]">
               Average response within 3 hours
@@ -104,15 +108,15 @@ export default function SupportPage({ onNavigate }) {
           <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] p-6 rounded-xl flex flex-col justify-between shadow-sm">
             <div>
               <div className="w-10 h-10 rounded-lg bg-[#F4F4F5] dark:bg-[#18181B] flex items-center justify-center text-black dark:text-white mb-4">
-                <span className="material-symbols-outlined text-[20px]">storefront</span>
+                <Icon className="text-[20px]">storefront</Icon>
               </div>
               <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#71717A] tracking-wider block mb-1">
                 Tech Lab & Walk-in Counter
               </span>
               <p className="font-['Space_Grotesk'] text-[14px] font-bold text-black dark:text-white leading-tight mb-1">
-                Suite 402, Precision Tech Tower
+                {settings.lahoreAddress || 'Lahore facility address not configured'}
               </p>
-              <span className="font-['Inter'] text-[12px] text-[#71717A] block">Gulberg III, Main Boulevard, Lahore</span>
+              <span className="font-['Inter'] text-[12px] text-[#71717A] block">Karachi: {settings.warehouseAddress || 'Address not configured'}</span>
             </div>
             <div className="mt-4 pt-3 border-t border-[#E4E4E7] dark:border-[#27272A] font-['Inter'] text-[12px] text-[#71717A]">
               In-person benchmark bays open
@@ -123,25 +127,25 @@ export default function SupportPage({ onNavigate }) {
           <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] p-6 rounded-xl flex flex-col justify-between shadow-sm">
             <div>
               <div className="w-10 h-10 rounded-lg bg-[#F4F4F5] dark:bg-[#18181B] flex items-center justify-center text-[#25D366] mb-4">
-                <span className="material-symbols-outlined text-[20px]">chat</span>
+                <Icon className="text-[20px]">chat</Icon>
               </div>
               <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase text-[#71717A] tracking-wider block mb-1">
                 Direct WhatsApp Stream
               </span>
               <p className="font-['Space_Grotesk'] text-[18px] font-bold text-black dark:text-white block mb-1">
-                +92 300 0000000
+                {settings.whatsappPhone || 'WhatsApp number not configured'}
               </p>
               <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A] block">Fast Dispatch Tracking</span>
             </div>
             <div className="mt-4 pt-2">
               <a
-                href="https://wa.me/923000000000"
+                href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-2.5 px-4 bg-[#25D366] hover:bg-[#20ba5a] text-black rounded font-['Space_Grotesk'] text-[11px] uppercase font-bold flex items-center justify-center gap-1.5 transition-colors"
               >
                 <span>Chat on WhatsApp</span>
-                <span className="material-symbols-outlined text-[16px]">arrow_outward</span>
+                <Icon className="text-[16px]">arrow_outward</Icon>
               </a>
             </div>
           </div>
@@ -167,7 +171,7 @@ export default function SupportPage({ onNavigate }) {
 
             {ticketSubmitted ? (
               <div className="p-8 bg-[#F4F4F5] dark:bg-[#18181B] rounded-xl border border-[#E4E4E7] dark:border-[#27272A] text-center flex flex-col items-center gap-3">
-                <span className="material-symbols-outlined text-[42px] text-black dark:text-white">check_circle</span>
+                <Icon className="text-[42px] text-black dark:text-white">check_circle</Icon>
                 <h3 className="font-['Space_Grotesk'] text-[20px] font-bold text-black dark:text-white">
                   Ticket Dispatched Successfully!
                 </h3>
@@ -261,7 +265,7 @@ export default function SupportPage({ onNavigate }) {
                   className="w-full sm:w-auto self-start px-8 py-3 bg-black text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 font-['Space_Grotesk'] text-[12px] font-bold uppercase rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer mt-2"
                 >
                   <span>Submit Support Ticket</span>
-                  <span className="material-symbols-outlined text-[16px]">send</span>
+                  <Icon className="text-[16px]">send</Icon>
                 </button>
               </form>
             )}
@@ -276,11 +280,11 @@ export default function SupportPage({ onNavigate }) {
                     HARDWARE FACILITY
                   </span>
                   <h3 className="font-['Space_Grotesk'] text-[18px] font-bold text-black dark:text-white">
-                    Gulberg III Tech Corridor
+                    {settings.lahoreAddress || 'Lahore facility address not configured'}
                   </h3>
                 </div>
                 <span className="font-['JetBrains_Mono'] text-[10px] text-[#71717A] bg-[#F4F4F5] dark:bg-[#18181B] px-2 py-1 rounded">
-                  GEO: 31.5204° N, 74.3587° E
+                  FACILITY ADDRESS
                 </span>
               </div>
 
@@ -298,7 +302,7 @@ export default function SupportPage({ onNavigate }) {
                     <div className="w-1.5 h-1.5 rounded-full bg-white dark:bg-black"></div>
                   </div>
                   <span className="font-['JetBrains_Mono'] text-[11px] font-bold text-black dark:text-white bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] px-2 py-0.5 rounded shadow mt-1">
-                    LAPTOPIA TECH TOWER #402
+                    {settings.storeName}
                   </span>
                 </div>
               </div>
@@ -306,7 +310,7 @@ export default function SupportPage({ onNavigate }) {
               <div className="flex flex-col gap-1.5 font-['JetBrains_Mono'] text-[11px] text-[#71717A] pt-1">
                 <div className="flex justify-between">
                   <span>Landmark:</span>
-                  <span className="text-black dark:text-white">Opposite Tech Plaza & Metro Hub</span>
+                  <span className="text-black dark:text-white">{settings.warehouseAddress || 'Not configured'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Walk-in Benchmarking:</span>
@@ -318,7 +322,7 @@ export default function SupportPage({ onNavigate }) {
             {/* Nationwide Dispatch Protocol */}
             <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] p-6 rounded-xl flex flex-col gap-3 shadow-sm">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[20px] text-black dark:text-white">verified</span>
+                <Icon className="text-[20px] text-black dark:text-white">verified</Icon>
                 <h4 className="font-['Space_Grotesk'] text-[15px] font-bold text-black dark:text-white uppercase">
                   National Fulfillment Protocol (PK)
                 </h4>
@@ -359,9 +363,7 @@ export default function SupportPage({ onNavigate }) {
                   className="w-full p-5 text-left flex items-center justify-between text-black dark:text-white font-['Space_Grotesk'] text-[15px] font-bold hover:bg-[#F4F4F5] dark:hover:bg-[#18181B] transition-colors cursor-pointer"
                 >
                   <span>{faq.q}</span>
-                  <span className="material-symbols-outlined text-[18px] text-[#71717A]">
-                    {activeFaq === idx ? 'remove' : 'add'}
-                  </span>
+                  <Icon className="text-[18px] text-[#71717A]">{activeFaq === idx ? 'remove' : 'add'}</Icon>
                 </button>
                 {activeFaq === idx && (
                   <div className="px-5 pb-5 font-['Inter'] text-[13px] text-[#71717A] leading-relaxed border-t border-[#E4E4E7] dark:border-[#27272A] pt-3">

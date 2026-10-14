@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { getSettings, updateSettings } from '../controllers/settingsController.js';
+import { authorize, protect } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 
 router.get('/', getSettings);
-router.put('/', updateSettings);
+router.put('/', protect, authorize('admin'), updateSettings);
 
 export default router;
