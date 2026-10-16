@@ -32,14 +32,14 @@ export default function HomePage({ onNavigate }) {
       title: "LAPTOPS. PCS. SERVERS. MINERS.",
       tag: "SYSTEMS FOR EVERY NEED",
       desc: "Find complete systems for gaming, study, office work, everyday use, server workloads, and mining.",
-      image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1600&q=80",
+      image: "https://res.cloudinary.com/ypejtyc0/image/upload/v1792154607/hero-1.jpg",
       cta: "SHOP ALL SYSTEMS"
     },
     {
       title: "CHOOSE THE SYSTEM THAT FITS.",
       tag: "GAMING • STUDENT • OFFICE • EVERYDAY",
       desc: "Browse laptops and desktop PCs, or explore servers and dedicated mining machines.",
-      image: "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=1600&q=80",
+      image: "https://res.cloudinary.com/ypejtyc0/image/upload/v1792154780/hero-2.jpg",
       cta: "BROWSE CATEGORIES"
     }
   ];
@@ -107,8 +107,8 @@ export default function HomePage({ onNavigate }) {
               style={{ backgroundImage: `url('${heroSlides[currentHeroSlide].image}')` }}
             />
             {/* Dark Scrim Gradients */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#09090B] via-[#09090B]/80 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#09090B] via-[#09090B]/60 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-[#09090B] via-[#09090B]/0 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-r from-[#09090B] via-[#09090B]/50 to-transparent" />
 
             {/* Hardware Identity Watermark */}
             <div className="absolute top-6 right-6 hidden md:flex items-center gap-3 bg-[#18181B]/80 backdrop-blur-md px-4 py-2 rounded-lg border border-[#3F3F46]">
