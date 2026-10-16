@@ -1,30 +1,128 @@
-# Laptopia backend
+# LAPTOPIA Backend
 
-## Seed the product catalog
+This folder contains the backend API for the LAPTOPIA storefront and admin console. It powers product listing, authentication, orders, customer data, and admin-only business tools.
 
-1. Configure the existing MongoDB connection and server settings in `backend/.env` (see `.env.example`).
-2. From the `backend` directory, run `npm run seed:catalog`.
-3. The seed upserts the 10 marked main categories, their 30 slugged subcategories, managed brands, and 30 example products. It can be run again safely; seeded rows are matched by stable slugs. It does not delete users, orders, customers, or other catalog records.
-4. The script verifies the category, subcategory, product, and product-to-subcategory counts and exits with an error if they do not meet the expected minimums.
+## Overview
 
-Seeded product descriptions identify the displayed PKR prices as demo samples, not verified market quotes, and advise confirming the exact regional configuration. Catalog photos use the project's existing public Unsplash image source URLs as generic illustrative imagery, not as claims that a photo depicts the exact retail SKU.
+The backend is built with:
 
-## Catalog API
+- Node.js + Express
+- MongoDB + Mongoose
+- JWT authentication
+- bcryptjs for password hashing
+- role-based authorization (`customer` and `admin`)
 
-- `GET /api/categories` — category records and subcategory names/slugs; seeded main categories have `catalogMain: true`.
-- `GET /api/categories/brands` — managed brands plus legacy product brand names.
-- `GET /api/products` — filters: `category` (category name, value, or slug), `subcategory` (subcategory slug), `brand`, `minPrice`, `maxPrice`, `inStock=true`, `status`, and `search`.
-- `GET /api/products/:id` — product details.
-- Admin-only product writes remain at `POST /api/products`, `PUT /api/products/:id`, and `DELETE /api/products/:id`.
-- Admin-only category and brand writes remain under `/api/categories` and `/api/categories/brands`.
+## Core responsibilities
 
-Product category and brand values intentionally remain strings to match the existing application schema and admin flows; category and brand administration is reused rather than duplicated.
+- user registration and login
+- product catalog APIs
+- category and brand management
+- order creation and status updates
+- customer account data and admin metrics
+- storefront configuration
+- admin account bootstrap from environment variables
 
-## Store settings, customers, and fulfillment
+## Environment setup
 
-- `GET /api/settings` — public storefront settings. `PUT /api/settings` — admin-only updates, including separate `supportPhone` and `whatsappPhone`; those values feed the Navbar, Support, Cart, Checkout, Footer, and invoice contact links.
-- `GET /api/customers` — admin-only customer directory with order counts and revenue metrics derived from actual orders.
-- `GET /api/customers/:id` — admin-only customer profile, order history/status counts, last order date, delivered (collected) revenue, all-status total order value, and non-cancelled/non-returned booked order value.
-- `PATCH /api/orders/:id/status` — admin-only safe fulfillment status updates. Orders can move pending → shipping/delivered/cancelled, shipping → delivered/cancelled, and delivered → returned. Cancellation/return restores reserved inventory once; terminal cancelled/returned orders cannot be reopened through this endpoint.
+Create a `backend/.env` file using the template in `.env.example`.
 
-Customer collected revenue counts delivered orders only. Booked value excludes cancelled and returned orders. This is order revenue, not net profit; cost of goods, shipping, and operating costs are not represented in the existing database.
+Required variables include:
+
+```env
+PORT=5000
+NODE_ENV=development
+MONGODB_URI=mongodb://127.0.0.1:27017/laptopia
+JWT_SECRET=replace_with_a_secure_random_value
+JWT_EXPIRES_IN=1d
+CLIENT_URL=http://localhost:5173
+ADMIN_NAME=LAPTOPIA Admin
+ADMIN_EMAIL=admin@laptopia.com.pk
+ADMIN_PASSWORD=LaptopiaAdmin@2025
+```
+
+Notes:
+- `ADMIN_EMAIL` and `ADMIN_PASSWORD` are the demo admin credentials used for protected admin access.
+- `ADMIN_PASSWORD` should be at least 12 characters in the project configuration.
+- These values are used to bootstrap the initial admin user when the database connects.
+
+## Admin access model
+
+Admin access is controlled by the `role` field on the user document.
+
+- public registration always creates a customer account
+- only the trusted server-side bootstrap can create an admin account
+- frontend routes check `user.role === 'admin'` before allowing access to `/admin`
+- backend routes also enforce admin authorization through middleware
+
+## Quick start
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+If the database is empty and the admin credentials are configured, the app will create the admin user during startup.
+
+## Database bootstrapping
+
+The project initializes default categories, brand records, store settings, and the admin user automatically when the app connects to MongoDB.
+
+## API summary
+
+### Auth
+- `POST /api/auth/register` — customer signup
+- `POST /api/auth/login` — login with email/password
+- `GET /api/auth/me` — fetch current user from JWT
+
+### Products
+- `GET /api/products` — public catalog listing with filters
+- `GET /api/products/:id` — product detail view
+- `POST /api/products` — admin-only create
+- `PUT /api/products/:id` — admin-only update
+- `DELETE /api/products/:id` — admin-only delete
+
+### Categories and brands
+- `GET /api/categories` — public category listing
+- `POST /api/categories` — admin-only create category
+- `PUT /api/categories/:id` — admin-only update category
+- `DELETE /api/categories/:id` — admin-only delete category
+- `GET /api/categories/brands` — public and admin brand data
+- `POST /api/categories/brands` — admin-only create brand
+- `PUT /api/categories/brands/:id` — admin-only update brand
+- `DELETE /api/categories/brands/:id` — admin-only delete brand
+
+### Orders and customers
+- `GET /api/orders` — admin-only order list
+- `GET /api/orders/:id` — admin-only order detail
+- `PATCH /api/orders/:id/status` — admin-only status updates
+- `GET /api/customers` — admin-only customer overview
+- `GET /api/customers/:id` — admin-only customer detail
+
+### Store settings
+- `GET /api/settings` — public storefront settings
+- `PUT /api/settings` — admin-only settings update
+
+## Seeding catalog data
+
+The project includes a seed script for demo data:
+
+```bash
+npm run seed:catalog
+```
+
+This script creates default categories, subcategories, and sample products useful for portfolio and demo presentation.
+
+## Notes for demo usage
+
+This project is intended as a realistic e-commerce demo. The store uses sample data and a demo admin account, which is ideal for assessing business logic and UI flows in interviews or portfolio reviews.
+
+## Security note
+
+For real deployments, use:
+- strong JWT secret
+- secure MongoDB credentials
+- production-grade secrets management
+- proper deployment environment policies
+
+Never expose live admin credentials in a public repository.
