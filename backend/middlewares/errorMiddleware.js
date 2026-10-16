@@ -1,6 +1,9 @@
 import ApiError from '../utils/ApiError.js';
 
 export default function errorMiddleware(err, req, res, next) {
+  // eslint-disable-next-line no-console
+  console.error(`[${req.method} ${req.originalUrl}]`, err);
+
   if (err.name === 'MulterError') {
     const statusCode = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
     const message = err.code === 'LIMIT_FILE_SIZE'
