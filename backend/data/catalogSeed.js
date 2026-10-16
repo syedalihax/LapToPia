@@ -4,29 +4,17 @@ const slugify = value => value
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-|-$/g, '');
 
-const categoryImages = {
-  laptops: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=1000&q=80',
-  desktops: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1000&q=80',
-  servers: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1000&q=80',
-  miners: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=1000&q=80',
-  displays: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=1000&q=80',
-  components: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=1000&q=80',
-  memory: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=1000&q=80',
-  storage: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=1000&q=80',
-  accessories: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=1000&q=80',
-};
-
 const categoryDefinitions = [
-  { name: 'Laptops', slug: 'laptops', icon: 'laptop_chromebook', imageGroup: 'laptops', subcategories: ['Business Laptops', 'Gaming Laptops', 'Student & Everyday Laptops'] },
-  { name: 'Desktop PCs', slug: 'desktop-pcs', icon: 'desktop_windows', imageGroup: 'desktops', subcategories: ['Office PCs', 'Gaming PCs', 'Workstation PCs'] },
-  { name: 'Graphics Cards (GPU)', slug: 'graphics-cards-gpu', icon: 'memory', imageGroup: 'components', subcategories: ['NVIDIA Gaming GPUs', 'AMD Gaming GPUs', 'Professional GPUs'] },
-  { name: 'Processors (CPU)', slug: 'processors-cpu', icon: 'memory', imageGroup: 'components', subcategories: ['Intel Desktop CPUs', 'AMD Desktop CPUs', 'Server CPUs'] },
-  { name: 'RAM & Memory', slug: 'ram-memory', icon: 'memory', imageGroup: 'memory', subcategories: ['DDR4 Desktop RAM', 'DDR5 Desktop RAM', 'Server Memory'] },
-  { name: 'SSD, HDD & Storage', slug: 'ssd-hdd-storage', icon: 'dns', imageGroup: 'storage', subcategories: ['NVMe SSDs', 'PCIe 5.0 SSDs', 'NAS & Enterprise Storage'] },
-  { name: 'Monitors & Displays', slug: 'monitors-displays', icon: 'desktop_windows', imageGroup: 'displays', subcategories: ['Office Monitors', 'Gaming Monitors', 'Professional 4K Monitors'] },
-  { name: 'Servers & Workstations', slug: 'servers-workstations', icon: 'dns', imageGroup: 'servers', subcategories: ['Tower Servers', 'Rack Servers', 'Professional Workstations'] },
-  { name: 'Miner Machines & Mining Hardware', slug: 'miner-machines-mining-hardware', icon: 'memory', imageGroup: 'miners', subcategories: ['Bitcoin ASIC Miners', 'Air-Cooled Mining Rigs', 'Mining Power Supplies & Accessories'] },
-  { name: 'Computer Accessories & Peripherals', slug: 'computer-accessories-peripherals', icon: 'category', imageGroup: 'accessories', subcategories: ['Wireless Mice', 'Keyboards & Adapters', 'Webcams & Audio'] },
+  { name: 'Laptops', slug: 'laptops', icon: 'laptop_chromebook', subcategories: ['Business Laptops', 'Gaming Laptops', 'Student & Everyday Laptops'] },
+  { name: 'Desktop PCs', slug: 'desktop-pcs', icon: 'desktop_windows', subcategories: ['Office PCs', 'Gaming PCs', 'Workstation PCs'] },
+  { name: 'Graphics Cards (GPU)', slug: 'graphics-cards-gpu', icon: 'memory', subcategories: ['NVIDIA Gaming GPUs', 'AMD Gaming GPUs', 'Professional GPUs'] },
+  { name: 'Processors (CPU)', slug: 'processors-cpu', icon: 'memory', subcategories: ['Intel Desktop CPUs', 'AMD Desktop CPUs', 'Server CPUs'] },
+  { name: 'RAM & Memory', slug: 'ram-memory', icon: 'memory', subcategories: ['DDR4 Desktop RAM', 'DDR5 Desktop RAM', 'Server Memory'] },
+  { name: 'SSD, HDD & Storage', slug: 'ssd-hdd-storage', icon: 'dns', subcategories: ['NVMe SSDs', 'PCIe 5.0 SSDs', 'NAS & Enterprise Storage'] },
+  { name: 'Monitors & Displays', slug: 'monitors-displays', icon: 'desktop_windows', subcategories: ['Office Monitors', 'Gaming Monitors', 'Professional 4K Monitors'] },
+  { name: 'Servers & Workstations', slug: 'servers-workstations', icon: 'dns', subcategories: ['Tower Servers', 'Rack Servers', 'Professional Workstations'] },
+  { name: 'Miner Machines & Mining Hardware', slug: 'miner-machines-mining-hardware', icon: 'memory', subcategories: ['Bitcoin ASIC Miners', 'Air-Cooled Mining Rigs', 'Mining Power Supplies & Accessories'] },
+  { name: 'Computer Accessories & Peripherals', slug: 'computer-accessories-peripherals', icon: 'category', subcategories: ['Wireless Mice', 'Keyboards & Adapters', 'Webcams & Audio'] },
 ].map(category => ({
   ...category,
   value: category.name,

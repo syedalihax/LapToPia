@@ -12,6 +12,7 @@ export default function AdminCategories() {
   const [form, setForm] = useState({ name: '', slug: '', value: '', icon: 'category', image: '', subcategories: '', tier: 'VERIFIED OEM', website: '' });
   const [initialForm, setInitialForm] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
@@ -60,6 +61,29 @@ export default function AdminCategories() {
 
   const closeEditor = () => setEditor(null);
   const hasFormChanges = initialForm && JSON.stringify(form) !== JSON.stringify(initialForm);
+
+  const handleCategoryImageUpload = async event => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    setError('');
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const response = await apiRequest('/api/categories/images', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await parseApiResponse(response);
+      setForm(prev => ({ ...prev, image: data.data.url }));
+    } catch (uploadError) {
+      setError(uploadError.message || 'Unable to upload category image.');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const handleSave = async event => {
     event.preventDefault();
@@ -162,12 +186,9 @@ export default function AdminCategories() {
                 <article key={category.id} className="rounded-xl border border-[#27272A] bg-[#121215] p-4 flex flex-col gap-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-lg bg-[#222226] text-white flex items-center justify-center shrink-0 overflow-hidden">
-                        {category.image ? (
-                          <img src={category.image} alt="" className="w-full h-full object-cover" onError={event => { event.currentTarget.style.display = 'none'; }} />
-                        ) : (
-                          <Icon className="text-xl">{category.icon || 'category'}</Icon>
-                        )}
+                      <div className="relative w-10 h-10 rounded-lg bg-[#222226] text-white flex items-center justify-center shrink-0 overflow-hidden">
+                        <Icon className="text-xl">{category.icon || 'category'}</Icon>
+                        {category.image && <img src={category.image} alt="" className="absolute inset-0 w-full h-full object-cover" onError={event => { event.currentTarget.style.display = 'none'; }} />}
                       </div>
                       <div className="min-w-0">
                         <h3 className="text-sm font-semibold text-white truncate">{category.name}</h3>
@@ -233,7 +254,7 @@ export default function AdminCategories() {
 
       {editor && (
         <div className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onMouseDown={event => { if (event.target === event.currentTarget) closeEditor(); }}>
-          <form onSubmit={handleSave} className="w-full max-w-lg bg-[#09090B] border border-[#3F3F46] rounded-2xl p-6 flex flex-col gap-4 shadow-2xl">
+          <form onSubmit={handleSave} className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[#09090B] border border-[#3F3F46] rounded-2xl p-6 flex flex-col gap-4 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <span className="text-[10px] text-[#71717A] uppercase tracking-widest">{editor.type}</span>
@@ -255,12 +276,42 @@ export default function AdminCategories() {
                 <label className="flex flex-col gap-1.5 text-xs text-[#A1A1AA]">Icon key
                   <input value={form.icon} onChange={event => setForm(prev => ({ ...prev, icon: event.target.value }))} className={inputClass} placeholder="laptop_chromebook" />
                 </label>
-                <label className="flex flex-col gap-1.5 text-xs text-[#A1A1AA]">Category image URL
-                  <input value={form.image} onChange={event => setForm(prev => ({ ...prev, image: event.target.value }))} className={inputClass} placeholder="https://... (shown on the homepage category card)" />
-                </label>
-                {form.image && (
-                  <img src={form.image} alt="Category preview" className="w-full h-28 object-cover rounded-lg border border-[#27272A]" onError={event => { event.currentTarget.style.display = 'none'; }} />
-                )}
+                <div className="flex flex-col gap-3 rounded-lg border border-[#27272A] bg-[#121215] p-3">
+                  <label className="flex flex-col gap-1.5 text-xs text-[#A1A1AA]">
+                    Upload category image (max 5 MB)
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={uploadingImage}
+                      onChange={handleCategoryImageUpload}
+                      className="w-full rounded-lg border border-[#27272A] bg-[#18181B] p-2 text-white file:mr-3 file:rounded file:border-0 file:bg-white file:px-3 file:py-1.5 file:text-black disabled:opacity-50"
+                    />
+                    {uploadingImage && <span className="text-blue-300">Uploading image to Cloudinary…</span>}
+                  </label>
+                  <label className="flex flex-col gap-1.5 text-xs text-[#A1A1AA]">Or paste an image URL
+                    <input
+                      type="url"
+                      value={form.image}
+                      onChange={event => setForm(prev => ({ ...prev, image: event.target.value }))}
+                      className={inputClass}
+                      placeholder="https://example.com/category-image.jpg"
+                    />
+                  </label>
+                  {form.image ? (
+                    <div className="flex flex-col gap-2">
+                      <img src={form.image} alt="Category preview" className="w-full h-36 object-cover rounded-lg border border-[#27272A]" onError={event => { event.currentTarget.style.display = 'none'; }} />
+                      <button
+                        type="button"
+                        onClick={() => setForm(prev => ({ ...prev, image: '' }))}
+                        className="self-start px-3 py-1.5 rounded-lg border border-red-900 text-red-300 text-xs hover:bg-red-950/40"
+                      >
+                        <Icon className="mr-1">delete</Icon> Remove category image
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-[#71717A]">No image selected. The category will show its icon instead of a default/fake image.</p>
+                  )}
+                </div>
                 <label className="flex flex-col gap-1.5 text-xs text-[#A1A1AA]">Subcategories (comma-separated)
                   <textarea rows={3} value={form.subcategories} onChange={event => setForm(prev => ({ ...prev, subcategories: event.target.value }))} className={`${inputClass} resize-y`} placeholder="Gaming, Creator, Business" />
                 </label>
@@ -278,7 +329,7 @@ export default function AdminCategories() {
             {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
             <div className="flex justify-end gap-2 pt-2">
               <button type="button" onClick={closeEditor} className="px-4 py-2 rounded-lg border border-[#3F3F46] text-[#D4D4D8] text-sm hover:bg-[#18181B]">Cancel</button>
-              {hasFormChanges && <button disabled={saving} type="submit" className="px-4 py-2 rounded-lg bg-white text-black text-sm font-bold disabled:opacity-50">{saving ? 'Saving…' : 'Save'}</button>}
+              {hasFormChanges && <button disabled={saving || uploadingImage} type="submit" className="px-4 py-2 rounded-lg bg-white text-black text-sm font-bold disabled:opacity-50">{saving ? 'Saving…' : 'Save'}</button>}
             </div>
           </form>
         </div>

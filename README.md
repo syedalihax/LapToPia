@@ -103,8 +103,8 @@ The admin account is created from environment variables in `backend/.env`:
 
 ```env
 ADMIN_NAME=LAPTOPIA Admin
-ADMIN_EMAIL=admin@laptopia.com.pk
-ADMIN_PASSWORD=LaptopiaAdmin@2025
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=replace_with_a_strong_private_password
 ```
 
 Important:
@@ -112,12 +112,9 @@ Important:
 - the backend auto-creates the admin account if the environment values are valid
 - for a real project, use strong and secure credentials and never expose production credentials in public repos
 
-### Demo login example
+### Admin login details
 
-```text
-Email: admin@laptopia.com.pk
-Password: LaptopiaAdmin@2025
-```
+Sign in with the email and password you configured privately in `backend/.env`.
 
 This is a safe demo pattern for a portfolio project because it clearly demonstrates the admin access model without exposing an insecure hidden bypass.
 
@@ -146,8 +143,8 @@ JWT_SECRET=your_secure_jwt_secret
 JWT_EXPIRES_IN=1d
 CLIENT_URL=http://localhost:5173
 ADMIN_NAME=LAPTOPIA Admin
-ADMIN_EMAIL=admin@laptopia.com.pk
-ADMIN_PASSWORD=LaptopiaAdmin@2025
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=replace_with_a_strong_private_password
 ```
 
 Start the backend:

@@ -44,80 +44,20 @@ export default function HomePage({ onNavigate }) {
     }
   ];
 
-  // One distinct, specific image per real category (used only when the
-  // category itself has no image saved in the admin panel yet).
-  const categoryImageByKey = {
-    'laptops': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOEWJz3VGOeHf0DkRl4Yaq6fDTjFGFnWkSxgOqIyvVjQ&s=10',
-    'desktop pcs': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS49cDfpXHEjfi6KzcxXtx35o1RbgP9cXaYimQUGeT8NA&s=10',
-    'pc': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEbdopt5TGW38TZYA_C51J-g3BAWd67j4RUga9Cwe-kg&s=10',
-    'graphics cards (gpu)': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQY-zykdVzzFmzXSpfGfrnYCCoVVGenX96r4t0wCL4wXA&s=10',
-    'processors (cpu)': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtu3RzrSyZlo-ii8ImSDt9QLVzJhY8NB5CxqQxalCGvA&s=10',
-    'ram & memory': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT80eI1yHgxBrHPlyrgDB6r7Yi7ZAEjY_P4x0qj6awkOg&s=10',
-    'ssd, hdd & storage': 'https://res.cloudinary.com/ypejtyc0/image/upload/v1792158223/sdds_and_hdds.jpg',
-    'monitors & displays': 'https://media.istockphoto.com/id/106581201/photo/the-multiscreen-monitor.jpg?s=612x612&w=0&k=20&c=oQDLbW3gg-lS4ZSJCGIymL_8U0kAjy367MForEKw46E=',
-    'servers & workstations': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvKlMiYBVj-fXOZM7bYyJJt4DWa0Ewm-YnNfv67ahwhQ&s=10',
-    'servers': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvKlMiYBVj-fXOZM7bYyJJt4DWa0Ewm-YnNfv67ahwhQ&s=10',
-    'miner machines & mining hardware': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3YfiOXj5ERl-Ya_7xGfcuPDa8CLMi3WRI7273M-aYmg&s=10',
-    'miner machines': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3YfiOXj5ERl-Ya_7xGfcuPDa8CLMi3WRI7273M-aYmg&s=10',
-    'computer accessories & peripherals': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUGYuUyP36ArbVZ5Ly-DXXAbgcydKnJUdFYQhV_f6KYQ&s=10',
-  };
-  const fallbackCategoryImage = 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1000&q=80';
-
-  const defaultCategories = [
-    {
-      id: 1,
-      num: "01 // LAPTOPS",
-      title: "Laptops",
-      desc: "Gaming, student, office, and everyday laptops.",
-      filter: "Laptops",
-      image: categoryImageByKey['laptops']
-    },
-    {
-      id: 2,
-      num: "02 // DESKTOP PCS",
-      title: "PC",
-      desc: "Desktop systems for gaming, study, office, and everyday use.",
-      filter: "PC",
-      image: categoryImageByKey['pc']
-    },
-    {
-      id: 3,
-      num: "03 // SERVERS",
-      title: "Servers",
-      desc: "Systems for business, storage, and server workloads.",
-      filter: "Servers",
-      image: categoryImageByKey['servers']
-    },
-    {
-      id: 4,
-      num: "04 // MINING SYSTEMS",
-      title: "Miner Machines",
-      desc: "Dedicated machines for cryptocurrency mining workloads.",
-      filter: "Miner Machines",
-      image: categoryImageByKey['miner machines']
-    }
-  ];
+  // Categories only use images explicitly saved by an admin. Empty image values
+  // remain image-free instead of silently showing demo/default artwork.
   const visibleCategoryRecords = categoryRecords.some(category => category.catalogMain)
     ? categoryRecords.filter(category => category.catalogMain)
     : categoryRecords;
-  const categories = visibleCategoryRecords.length
-    ? visibleCategoryRecords.map((category, index) => {
-      const key = (category.value || category.name || '').toLowerCase();
-      // Priority: 1) image saved on the category itself (admin panel)
-      // 2) a specific image matched by this category's own name/value
-      // 3) a generic fallback — never another category's image, and
-      // never cycled/reused across categories.
-      const resolvedImage = category.image || categoryImageByKey[key] || fallbackCategoryImage;
-      return {
-        id: category.id,
-        num: `${String(index + 1).padStart(2, '0')} // ${category.name.toUpperCase()}`,
-        title: category.name,
-        filter: category.value || category.name,
-        image: resolvedImage,
-        desc: category.subcategories?.map(subcategory => typeof subcategory === 'string' ? subcategory : subcategory.name).join(' · ') || `Browse ${category.name} in the LAPTOPIA catalog.`,
-      };
-    })
-    : defaultCategories;
+  const categories = visibleCategoryRecords.map((category, index) => ({
+    id: category.id,
+    num: `${String(index + 1).padStart(2, '0')} // ${category.name.toUpperCase()}`,
+    title: category.name,
+    filter: category.value || category.name,
+    image: typeof category.image === 'string' ? category.image.trim() : '',
+    icon: category.icon || 'category',
+    desc: category.subcategories?.map(subcategory => typeof subcategory === 'string' ? subcategory : subcategory.name).join(' · ') || `Browse ${category.name} in the LAPTOPIA catalog.`,
+  }));
 
   return (
     <div className="flex flex-col w-full bg-[#FAFAFA] dark:bg-[#09090B] text-[#09090B] dark:text-[#FAFAFA] transition-colors duration-200">
@@ -232,19 +172,32 @@ export default function HomePage({ onNavigate }) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => onNavigate && onNavigate('catalog', { category: cat.filter })}
-                className="group relative h-72 rounded-xl bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] overflow-hidden flex flex-col justify-end p-6 text-left transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl cursor-pointer"
-              >
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                  style={{ backgroundImage: `url('${cat.image}')` }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-                <div className="relative z-10 flex flex-col gap-1">
+          {categories.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-[#D4D4D8] dark:border-[#3F3F46] p-8 text-center text-sm text-[#71717A]">
+              No categories are configured yet. Add categories from the admin panel to show them here.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => onNavigate && onNavigate('catalog', { category: cat.filter })}
+                  className="group relative h-72 rounded-xl bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] overflow-hidden flex flex-col justify-end p-6 text-left transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl cursor-pointer"
+                >
+                  {cat.image ? (
+                    <>
+                      <div
+                        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                        style={{ backgroundImage: `url('${cat.image}')` }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#18181B] to-[#09090B]">
+                      <Icon className="text-[64px] text-[#52525B] transition-transform duration-500 group-hover:scale-110">{cat.icon}</Icon>
+                    </div>
+                  )}
+                  <div className="relative z-10 flex flex-col gap-1">
                   <span className="font-['JetBrains_Mono'] text-[10px] text-[#D4D4D8] uppercase tracking-wider">
                     {cat.num}
                   </span>
@@ -258,10 +211,11 @@ export default function HomePage({ onNavigate }) {
                     <span>EXPLORE PRODUCTS</span>
                     <Icon className="text-[16px] transition-transform group-hover:translate-x-1">arrow_forward</Icon>
                   </div>
-                </div>
-              </button>
-            ))}
-          </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

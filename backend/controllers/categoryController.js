@@ -9,6 +9,16 @@ const toSlug = value => String(value ?? '')
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-|-$/g, '');
 
+const isValidImageUrl = value => {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
 const cleanSubcategories = (value, categorySlug) => {
   const items = Array.isArray(value) ? value : typeof value === 'string' ? value.split(',') : [];
   return items.map(item => {
@@ -87,6 +97,10 @@ export const createCategory = async (req, res, next) => {
 
     const slug = toSlug(req.body.slug || name);
     if (!slug) return next(new ApiError(400, 'Category slug must contain letters or numbers'));
+    const image = typeof req.body.image === 'string' ? req.body.image.trim() : '';
+    if (!isValidImageUrl(image)) {
+      return next(new ApiError(400, 'Category image must be a valid HTTP or HTTPS URL'));
+    }
     const subcategories = cleanSubcategories(req.body.subcategories, slug);
     if (await hasSubcategorySlugConflict(subcategories, slug)) {
       return next(new ApiError(409, 'Category subcategory slugs must be unique'));
@@ -96,7 +110,7 @@ export const createCategory = async (req, res, next) => {
       slug,
       value: typeof req.body.value === 'string' && req.body.value.trim() ? req.body.value.trim() : name,
       icon: req.body.icon?.trim() || 'category',
-      image: typeof req.body.image === 'string' ? req.body.image.trim() : '',
+      image,
       subcategories,
     });
     res.status(201).json({ success: true, data: serializeCategory(category) });
@@ -128,7 +142,12 @@ export const updateCategory = async (req, res, next) => {
       updates.value = req.body.value.trim();
     }
     if (req.body.icon !== undefined) updates.icon = String(req.body.icon).trim() || 'category';
-    if (req.body.image !== undefined) updates.image = String(req.body.image).trim();
+    if (req.body.image !== undefined) {
+      updates.image = String(req.body.image).trim();
+      if (!isValidImageUrl(updates.image)) {
+        return next(new ApiError(400, 'Category image must be a valid HTTP or HTTPS URL'));
+      }
+    }
     if (req.body.subcategories !== undefined) {
       updates.subcategories = cleanSubcategories(req.body.subcategories, updates.slug || existingCategory.slug);
     }

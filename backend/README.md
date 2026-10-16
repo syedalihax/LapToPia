@@ -36,12 +36,12 @@ JWT_SECRET=replace_with_a_secure_random_value
 JWT_EXPIRES_IN=1d
 CLIENT_URL=http://localhost:5173
 ADMIN_NAME=LAPTOPIA Admin
-ADMIN_EMAIL=admin@laptopia.com.pk
-ADMIN_PASSWORD=LaptopiaAdmin@2025
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=replace_with_a_strong_private_password
 ```
 
 Notes:
-- `ADMIN_EMAIL` and `ADMIN_PASSWORD` are the demo admin credentials used for protected admin access.
+- `ADMIN_EMAIL` and `ADMIN_PASSWORD` configure the initial admin account used for protected admin access.
 - `ADMIN_PASSWORD` should be at least 12 characters in the project configuration.
 - These values are used to bootstrap the initial admin user when the database connects.
 
@@ -78,15 +78,18 @@ The project initializes default categories, brand records, store settings, and t
 ### Products
 - `GET /api/products` — public catalog listing with filters
 - `GET /api/products/:id` — product detail view
+- `POST /api/products/images` — admin-only upload of up to five product images
 - `POST /api/products` — admin-only create
 - `PUT /api/products/:id` — admin-only update
 - `DELETE /api/products/:id` — admin-only delete
 
 ### Categories and brands
 - `GET /api/categories` — public category listing
+- `POST /api/categories/images` — admin-only upload of one category image (multipart field: `image`, max 5 MB)
 - `POST /api/categories` — admin-only create category
 - `PUT /api/categories/:id` — admin-only update category
 - `DELETE /api/categories/:id` — admin-only delete category
+- Category images are optional; no default/demo image is applied when a category has no saved image URL.
 - `GET /api/categories/brands` — public and admin brand data
 - `POST /api/categories/brands` — admin-only create brand
 - `PUT /api/categories/brands/:id` — admin-only update brand

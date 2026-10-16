@@ -52,16 +52,9 @@ The admin panel is protected by a route guard.
 
 This is the recommended pattern for a portfolio project because it proves proper authorization logic rather than fake UI-only restrictions.
 
-## Demo admin credentials
+## Admin credentials
 
-The project expects an admin account to exist in the backend database. The default credentials are configured in `backend/.env`.
-
-Example:
-
-```text
-Email: syedali@gmail.com
-Password: Hax_codE-03@
-```
+The project expects an admin account to exist in the backend database. Configure private credentials in your local `backend/.env` file and use those values to sign in. Do not publish the values.
 
 For production use, replace them with secure values and keep them out of version control.
 
