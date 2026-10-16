@@ -95,12 +95,34 @@ async function seedDefaults() {
   await Product.updateMany({ category: 'Personal Computer' }, { $set: { category: 'PC' } });
 
   const productBrandNames = await Product.distinct('brand');
-  for (const name of productBrandNames.filter(Boolean)) {
-    await Brand.updateOne(
-      { name },
-      { $setOnInsert: { name, slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), tier: 'VERIFIED OEM' } },
-      { upsert: true }
-    );
+  for (const rawName of productBrandNames) {
+    const name = typeof rawName === 'string' ? rawName.trim() : '';
+    if (!name) continue;
+
+    const slug = name.toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+    if (!slug) continue;
+
+    // A brand can already exist with the same slug but different name casing
+    // (for example, "Apple" and "apple"). Checking only `name` and using
+    // upsert would then violate the unique slug index and crash startup.
+    const existingBrand = await Brand.findOne({ $or: [{ name }, { slug }] })
+      .select('_id name slug')
+      .lean();
+    if (existingBrand) continue;
+
+    try {
+      await Brand.create({ name, slug, tier: 'VERIFIED OEM' });
+    } catch (error) {
+      // Handle a concurrent seed/admin insert safely without bringing down
+      // the production server. Re-throw unrelated database errors.
+      if (error?.code === 11000) {
+        console.warn(`[seedDefaults] Skipping brand "${name}": its name or slug already exists.`);
+        continue;
+      }
+      throw error;
+    }
   }
 
   const settingsCount = await Setting.countDocuments();
