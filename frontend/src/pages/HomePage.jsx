@@ -51,7 +51,7 @@ export default function HomePage({ onNavigate }) {
       title: "Laptops",
       desc: "Gaming, student, office, and everyday laptops.",
       filter: "Laptops",
-      image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80"
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWk_E-g_hjqJEdjHgvjz4-ykBHm2iCpfNyjTYHWkJjpg&s=10"
     },
     {
       id: 2,
@@ -59,7 +59,7 @@ export default function HomePage({ onNavigate }) {
       title: "PC",
       desc: "Desktop systems for gaming, study, office, and everyday use.",
       filter: "PC",
-      image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80"
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS49cDfpXHEjfi6KzcxXtx35o1RbgP9cXaYimQUGeT8NA&s=10"
     },
     {
       id: 3,
@@ -67,7 +67,7 @@ export default function HomePage({ onNavigate }) {
       title: "Servers",
       desc: "Systems for business, storage, and server workloads.",
       filter: "Servers",
-      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80"
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaxWZ-c__nnHpIls9d_VW3Dn0rJmFA-JvRzWEwRTbQAw&s=10"
     },
     {
       id: 4,
@@ -75,7 +75,7 @@ export default function HomePage({ onNavigate }) {
       title: "Miner Machines",
       desc: "Dedicated machines for cryptocurrency mining workloads.",
       filter: "Miner Machines",
-      image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=800&q=80"
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC1UD4I-ZKkk-ZGBhvR4-VFZgHdw3EttiUPiVKVEGEsw&s=10"
     }
   ];
   const visibleCategoryRecords = categoryRecords.some(category => category.catalogMain)
