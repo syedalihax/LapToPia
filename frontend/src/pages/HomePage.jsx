@@ -47,19 +47,19 @@ export default function HomePage({ onNavigate }) {
   // One distinct, specific image per real category (used only when the
   // category itself has no image saved in the admin panel yet).
   const categoryImageByKey = {
-    'laptops': 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=1000&q=80',
-    'desktop pcs': 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1000&q=80',
-    'pc': 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1000&q=80',
-    'graphics cards (gpu)': 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80',
-    'processors (cpu)': 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1000&q=80',
-    'ram & memory': 'https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=1000&q=80',
-    'ssd, hdd & storage': 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=1000&q=80',
-    'monitors & displays': 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=1000&q=80',
-    'servers & workstations': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1000&q=80',
-    'servers': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1000&q=80',
-    'miner machines & mining hardware': 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=1000&q=80',
-    'miner machines': 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=1000&q=80',
-    'computer accessories & peripherals': 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=1000&q=80',
+    'laptops': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOEWJz3VGOeHf0DkRl4Yaq6fDTjFGFnWkSxgOqIyvVjQ&s=10',
+    'desktop pcs': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS49cDfpXHEjfi6KzcxXtx35o1RbgP9cXaYimQUGeT8NA&s=10',
+    'pc': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEbdopt5TGW38TZYA_C51J-g3BAWd67j4RUga9Cwe-kg&s=10',
+    'graphics cards (gpu)': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQY-zykdVzzFmzXSpfGfrnYCCoVVGenX96r4t0wCL4wXA&s=10',
+    'processors (cpu)': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtu3RzrSyZlo-ii8ImSDt9QLVzJhY8NB5CxqQxalCGvA&s=10',
+    'ram & memory': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT80eI1yHgxBrHPlyrgDB6r7Yi7ZAEjY_P4x0qj6awkOg&s=10',
+    'ssd, hdd & storage': 'https://res.cloudinary.com/ypejtyc0/image/upload/v1792158223/sdds_and_hdds.jpg',
+    'monitors & displays': 'https://media.istockphoto.com/id/106581201/photo/the-multiscreen-monitor.jpg?s=612x612&w=0&k=20&c=oQDLbW3gg-lS4ZSJCGIymL_8U0kAjy367MForEKw46E=',
+    'servers & workstations': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvKlMiYBVj-fXOZM7bYyJJt4DWa0Ewm-YnNfv67ahwhQ&s=10',
+    'servers': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvKlMiYBVj-fXOZM7bYyJJt4DWa0Ewm-YnNfv67ahwhQ&s=10',
+    'miner machines & mining hardware': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3YfiOXj5ERl-Ya_7xGfcuPDa8CLMi3WRI7273M-aYmg&s=10',
+    'miner machines': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3YfiOXj5ERl-Ya_7xGfcuPDa8CLMi3WRI7273M-aYmg&s=10',
+    'computer accessories & peripherals': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUGYuUyP36ArbVZ5Ly-DXXAbgcydKnJUdFYQhV_f6KYQ&s=10',
   };
   const fallbackCategoryImage = 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1000&q=80';
 
