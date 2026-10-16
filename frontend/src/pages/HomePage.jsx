@@ -44,6 +44,25 @@ export default function HomePage({ onNavigate }) {
     }
   ];
 
+  // One distinct, specific image per real category (used only when the
+  // category itself has no image saved in the admin panel yet).
+  const categoryImageByKey = {
+    'laptops': 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=1000&q=80',
+    'desktop pcs': 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1000&q=80',
+    'pc': 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1000&q=80',
+    'graphics cards (gpu)': 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80',
+    'processors (cpu)': 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1000&q=80',
+    'ram & memory': 'https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=1000&q=80',
+    'ssd, hdd & storage': 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=1000&q=80',
+    'monitors & displays': 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=1000&q=80',
+    'servers & workstations': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1000&q=80',
+    'servers': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1000&q=80',
+    'miner machines & mining hardware': 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=1000&q=80',
+    'miner machines': 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=1000&q=80',
+    'computer accessories & peripherals': 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=1000&q=80',
+  };
+  const fallbackCategoryImage = 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1000&q=80';
+
   const defaultCategories = [
     {
       id: 1,
@@ -51,7 +70,7 @@ export default function HomePage({ onNavigate }) {
       title: "Laptops",
       desc: "Gaming, student, office, and everyday laptops.",
       filter: "Laptops",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWk_E-g_hjqJEdjHgvjz4-ykBHm2iCpfNyjTYHWkJjpg&s=10"
+      image: categoryImageByKey['laptops']
     },
     {
       id: 2,
@@ -59,7 +78,7 @@ export default function HomePage({ onNavigate }) {
       title: "PC",
       desc: "Desktop systems for gaming, study, office, and everyday use.",
       filter: "PC",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS49cDfpXHEjfi6KzcxXtx35o1RbgP9cXaYimQUGeT8NA&s=10"
+      image: categoryImageByKey['pc']
     },
     {
       id: 3,
@@ -67,7 +86,7 @@ export default function HomePage({ onNavigate }) {
       title: "Servers",
       desc: "Systems for business, storage, and server workloads.",
       filter: "Servers",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaxWZ-c__nnHpIls9d_VW3Dn0rJmFA-JvRzWEwRTbQAw&s=10"
+      image: categoryImageByKey['servers']
     },
     {
       id: 4,
@@ -75,7 +94,7 @@ export default function HomePage({ onNavigate }) {
       title: "Miner Machines",
       desc: "Dedicated machines for cryptocurrency mining workloads.",
       filter: "Miner Machines",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC1UD4I-ZKkk-ZGBhvR4-VFZgHdw3EttiUPiVKVEGEsw&s=10"
+      image: categoryImageByKey['miner machines']
     }
   ];
   const visibleCategoryRecords = categoryRecords.some(category => category.catalogMain)
@@ -83,13 +102,18 @@ export default function HomePage({ onNavigate }) {
     : categoryRecords;
   const categories = visibleCategoryRecords.length
     ? visibleCategoryRecords.map((category, index) => {
-      const template = defaultCategories.find(item => item.filter.toLowerCase() === (category.value || category.name).toLowerCase())
-        || defaultCategories[index % defaultCategories.length];
+      const key = (category.value || category.name || '').toLowerCase();
+      // Priority: 1) image saved on the category itself (admin panel)
+      // 2) a specific image matched by this category's own name/value
+      // 3) a generic fallback — never another category's image, and
+      // never cycled/reused across categories.
+      const resolvedImage = category.image || categoryImageByKey[key] || fallbackCategoryImage;
       return {
-        ...template,
         id: category.id,
+        num: `${String(index + 1).padStart(2, '0')} // ${category.name.toUpperCase()}`,
         title: category.name,
         filter: category.value || category.name,
+        image: resolvedImage,
         desc: category.subcategories?.map(subcategory => typeof subcategory === 'string' ? subcategory : subcategory.name).join(' · ') || `Browse ${category.name} in the LAPTOPIA catalog.`,
       };
     })

@@ -14,6 +14,7 @@ const categorySchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true, trim: true },
     value: { type: String, required: true, trim: true },
     icon: { type: String, default: 'category' },
+    image: { type: String, trim: true, default: '' },
     catalogMain: { type: Boolean, default: false },
     subcategories: [subcategorySchema]
   },

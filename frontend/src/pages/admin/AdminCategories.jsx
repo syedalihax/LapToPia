@@ -9,7 +9,7 @@ export default function AdminCategories() {
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editor, setEditor] = useState(null);
-  const [form, setForm] = useState({ name: '', slug: '', value: '', icon: 'category', subcategories: '', tier: 'VERIFIED OEM', website: '' });
+  const [form, setForm] = useState({ name: '', slug: '', value: '', icon: 'category', image: '', subcategories: '', tier: 'VERIFIED OEM', website: '' });
   const [initialForm, setInitialForm] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -49,6 +49,7 @@ export default function AdminCategories() {
       slug: item?.slug || '',
       value: item?.value || item?.name || '',
       icon: item?.icon || 'category',
+      image: item?.image || '',
       subcategories: Array.isArray(item?.subcategories) ? item.subcategories.map(subcategory => typeof subcategory === 'string' ? subcategory : subcategory.name).join(', ') : '',
       tier: item?.tier || 'VERIFIED OEM',
       website: item?.website || '',
@@ -71,7 +72,7 @@ export default function AdminCategories() {
         ? `/api/categories${editor.id ? `/${editor.id}` : ''}`
         : `/api/categories/brands${editor.id ? `/${editor.id}` : ''}`;
       const payload = isCategory
-        ? { name: form.name.trim(), slug: form.slug.trim(), value: form.value.trim(), icon: form.icon.trim(), subcategories: form.subcategories }
+        ? { name: form.name.trim(), slug: form.slug.trim(), value: form.value.trim(), icon: form.icon.trim(), image: form.image.trim(), subcategories: form.subcategories }
         : { name: form.name.trim(), slug: form.slug.trim(), tier: form.tier.trim(), website: form.website.trim() };
       const response = await apiRequest(url, {
         method: editor.id ? 'PUT' : 'POST',
@@ -161,8 +162,12 @@ export default function AdminCategories() {
                 <article key={category.id} className="rounded-xl border border-[#27272A] bg-[#121215] p-4 flex flex-col gap-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-lg bg-[#222226] text-white flex items-center justify-center shrink-0">
-                        <Icon className="text-xl">{category.icon || 'category'}</Icon>
+                      <div className="w-10 h-10 rounded-lg bg-[#222226] text-white flex items-center justify-center shrink-0 overflow-hidden">
+                        {category.image ? (
+                          <img src={category.image} alt="" className="w-full h-full object-cover" onError={event => { event.currentTarget.style.display = 'none'; }} />
+                        ) : (
+                          <Icon className="text-xl">{category.icon || 'category'}</Icon>
+                        )}
                       </div>
                       <div className="min-w-0">
                         <h3 className="text-sm font-semibold text-white truncate">{category.name}</h3>
@@ -250,6 +255,12 @@ export default function AdminCategories() {
                 <label className="flex flex-col gap-1.5 text-xs text-[#A1A1AA]">Icon key
                   <input value={form.icon} onChange={event => setForm(prev => ({ ...prev, icon: event.target.value }))} className={inputClass} placeholder="laptop_chromebook" />
                 </label>
+                <label className="flex flex-col gap-1.5 text-xs text-[#A1A1AA]">Category image URL
+                  <input value={form.image} onChange={event => setForm(prev => ({ ...prev, image: event.target.value }))} className={inputClass} placeholder="https://... (shown on the homepage category card)" />
+                </label>
+                {form.image && (
+                  <img src={form.image} alt="Category preview" className="w-full h-28 object-cover rounded-lg border border-[#27272A]" onError={event => { event.currentTarget.style.display = 'none'; }} />
+                )}
                 <label className="flex flex-col gap-1.5 text-xs text-[#A1A1AA]">Subcategories (comma-separated)
                   <textarea rows={3} value={form.subcategories} onChange={event => setForm(prev => ({ ...prev, subcategories: event.target.value }))} className={`${inputClass} resize-y`} placeholder="Gaming, Creator, Business" />
                 </label>

@@ -96,6 +96,7 @@ export const createCategory = async (req, res, next) => {
       slug,
       value: typeof req.body.value === 'string' && req.body.value.trim() ? req.body.value.trim() : name,
       icon: req.body.icon?.trim() || 'category',
+      image: typeof req.body.image === 'string' ? req.body.image.trim() : '',
       subcategories,
     });
     res.status(201).json({ success: true, data: serializeCategory(category) });
@@ -127,6 +128,7 @@ export const updateCategory = async (req, res, next) => {
       updates.value = req.body.value.trim();
     }
     if (req.body.icon !== undefined) updates.icon = String(req.body.icon).trim() || 'category';
+    if (req.body.image !== undefined) updates.image = String(req.body.image).trim();
     if (req.body.subcategories !== undefined) {
       updates.subcategories = cleanSubcategories(req.body.subcategories, updates.slug || existingCategory.slug);
     }
