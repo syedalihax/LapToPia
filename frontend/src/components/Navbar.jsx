@@ -19,6 +19,8 @@ export default function Navbar({ currentPath = 'home', onNavigate }) {
   const searchContainerRef = useRef(null);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -70,7 +72,17 @@ export default function Navbar({ currentPath = 'home', onNavigate }) {
     if (onNavigate) {
       onNavigate('catalog', { search: searchQuery });
       setSearchOpen(false);
+      setMobileSearchOpen(false);
+      setMobileMenuOpen(false);
     }
+  };
+
+  const goTo = (route, params = {}) => {
+    onNavigate?.(route, params);
+    setMobileMenuOpen(false);
+    setMobileSearchOpen(false);
+    setAccountMenuOpen(false);
+    setCategoryMenuOpen(false);
   };
 
   const navLinks = [
@@ -85,18 +97,18 @@ export default function Navbar({ currentPath = 'home', onNavigate }) {
       className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b border-[#E4E4E7] dark:border-[#27272A] shadow-sm transition-[border-color] duration-200"
     >
       {/* Single Unified Sleek Navigation Bar (Second lower navbar removed) */}
-      <div className="h-20 max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between gap-4 lg:gap-8">
+      <div className="h-16 sm:h-20 max-w-[1440px] mx-auto px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-4 lg:gap-8">
         {/* Brand / Logo */}
         <button
-          onClick={() => onNavigate && onNavigate('home')}
-          className="flex items-center gap-3 shrink-0 text-left cursor-pointer group"
+          onClick={() => goTo('home')}
+          className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0 text-left cursor-pointer group"
         >
-          <Logo className="h-9 w-9" />
-          <div className="flex flex-col">
-            <span className="font-['Space_Grotesk'] text-[20px] font-bold text-[#09090B] dark:text-white tracking-tight uppercase leading-none">
+          <Logo className="h-8 w-8 sm:h-9 sm:w-9 shrink-0" />
+          <div className="flex flex-col min-w-0">
+            <span className="font-['Space_Grotesk'] text-[16px] sm:text-[20px] font-bold text-[#09090B] dark:text-white tracking-tight uppercase leading-none truncate">
               {settings.storeName}
             </span>
-            <span className="font-['JetBrains_Mono'] text-[9px] uppercase tracking-widest text-[#71717A] mt-0.5">
+            <span className="hidden sm:block font-['JetBrains_Mono'] text-[9px] uppercase tracking-widest text-[#71717A] mt-0.5">
               Hardwares
             </span>
           </div>
@@ -190,7 +202,16 @@ export default function Navbar({ currentPath = 'home', onNavigate }) {
         </form>
 
         {/* User Controls Cluster */}
-        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <button
+            type="button"
+            onClick={() => { setMobileSearchOpen(open => !open); setMobileMenuOpen(false); }}
+            className="md:hidden w-9 h-9 rounded-lg bg-[#F4F4F5] dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] text-black dark:text-white flex items-center justify-center"
+            aria-label="Search products"
+          >
+            <Icon className="text-[19px]">search</Icon>
+          </button>
+
           {/* Direct Support */}
           <div className="hidden xl:flex flex-col text-right font-['JetBrains_Mono'] text-[11px] leading-tight mr-2">
             <span className="text-[#71717A]">Support PK:</span>
@@ -239,8 +260,8 @@ export default function Navbar({ currentPath = 'home', onNavigate }) {
 
           {/* Cart Bag */}
           <button
-            onClick={() => onNavigate && onNavigate('cart')}
-            className="relative flex items-center gap-2 py-1.5 px-3 rounded-lg bg-[#09090B] dark:bg-[#121215] border border-black dark:border-[#27272A] text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+            onClick={() => goTo('cart')}
+            className="relative flex items-center gap-2 py-1.5 px-2 sm:px-3 rounded-lg bg-[#09090B] dark:bg-[#121215] border border-black dark:border-[#27272A] text-white hover:bg-neutral-800 transition-colors cursor-pointer"
             title="Shopping Cart"
           >
             <Icon className="text-[20px]">shopping_bag</Icon>
@@ -248,8 +269,95 @@ export default function Navbar({ currentPath = 'home', onNavigate }) {
               {totalItems}
             </span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => { setMobileMenuOpen(open => !open); setMobileSearchOpen(false); }}
+            className="lg:hidden w-9 h-9 rounded-lg bg-[#F4F4F5] dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] text-black dark:text-white flex items-center justify-center"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            <Icon className="text-[20px]">{mobileMenuOpen ? 'close' : 'menu'}</Icon>
+          </button>
         </div>
       </div>
+
+      {mobileSearchOpen && (
+        <form onSubmit={handleSearchSubmit} className="md:hidden border-t border-[#E4E4E7] dark:border-[#27272A] px-3 py-3">
+          <div className="relative flex items-center">
+            <Icon className="absolute left-3 text-[#71717A] text-[18px] pointer-events-none">search</Icon>
+            <input
+              type="text"
+              autoFocus
+              value={searchQuery}
+              onChange={event => {
+                const value = event.target.value;
+                setSearchQuery(value);
+                setSearchOpen(true);
+                setSearchLoading(Boolean(value.trim()));
+                setSearchError('');
+                if (!value.trim()) setSearchResults([]);
+              }}
+              placeholder="Search products..."
+              className="w-full h-11 pl-10 pr-20 bg-[#F4F4F5] dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] rounded-lg text-black dark:text-white font-['Inter'] text-[13px] placeholder:text-[#71717A] focus:outline-none"
+            />
+            <button type="submit" className="absolute right-1.5 px-3 py-1.5 bg-white dark:bg-[#18181B] text-[11px] font-['Space_Grotesk'] font-bold uppercase rounded text-black dark:text-white border border-[#D4D4D8] dark:border-[#3F3F46]">
+              Go
+            </button>
+          </div>
+          {searchQuery.trim() && (
+            <div className="mt-2 max-h-64 overflow-y-auto rounded-xl border border-[#D4D4D8] bg-white p-2 dark:border-[#52525B] dark:bg-[#18181B]">
+              {searchLoading ? (
+                <p className="px-3 py-3 text-sm text-[#52525B] dark:text-[#D4D4D8]">Searching products…</p>
+              ) : searchError ? (
+                <p className="px-3 py-3 text-sm text-red-700">{searchError}</p>
+              ) : searchResults.length ? searchResults.map(product => (
+                <button key={product.id} type="button" onClick={() => { setSearchQuery(''); goTo('product-detail', { id: product.id }); }} className="flex w-full items-center gap-3 rounded-lg p-2 text-left text-black hover:bg-[#F4F4F5] dark:text-white dark:hover:bg-[#27272A]">
+                  <img src={product.images?.[0] || ''} alt="" className="h-10 w-12 shrink-0 rounded object-contain bg-[#F4F4F5] dark:bg-[#09090B]" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold">{product.title}</span>
+                    <span className="block text-xs">Rs. {Number(product.pricePKR).toLocaleString()}</span>
+                  </span>
+                </button>
+              )) : (
+                <p className="px-3 py-3 text-sm text-[#52525B] dark:text-[#D4D4D8]">No matching products.</p>
+              )}
+            </div>
+          )}
+        </form>
+      )}
+
+      {mobileMenuOpen && (
+        <div className="lg:hidden border-t border-[#E4E4E7] dark:border-[#27272A] bg-white dark:bg-[#09090B] px-3 py-4 max-h-[min(70vh,32rem)] overflow-y-auto">
+          <nav className="flex flex-col gap-1">
+            {navLinks.map((item, idx) => (
+              <button
+                key={idx}
+                onClick={() => goTo(item.path, item.filter ? { category: item.filter } : {})}
+                className={`rounded-lg px-3 py-3 text-left font-['Space_Grotesk'] text-[13px] uppercase tracking-wider font-bold ${
+                  currentPath === item.path ? 'bg-[#F4F4F5] text-black dark:bg-[#18181B] dark:text-white' : 'text-[#71717A]'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+          <p className="mt-4 mb-2 px-3 font-['Space_Grotesk'] text-[11px] font-bold uppercase tracking-widest text-[#71717A]">Categories</p>
+          <div className="flex flex-col gap-1">
+            {categories.map(category => (
+              <button
+                key={category.id || category.slug}
+                type="button"
+                onClick={() => goTo('catalog', { category: category.value || category.name })}
+                className="rounded-lg px-3 py-2.5 text-left text-sm text-black dark:text-white hover:bg-[#F4F4F5] dark:hover:bg-[#18181B]"
+              >
+                {category.name}
+              </button>
+            ))}
+            {categories.length === 0 && <span className="px-3 py-2 text-xs text-[#71717A]">Categories are unavailable.</span>}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

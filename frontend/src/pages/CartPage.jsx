@@ -67,7 +67,7 @@ export default function CartPage({ onNavigate }) {
           <div className="lg:col-span-8 flex flex-col gap-4">
             <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] rounded-xl overflow-hidden shadow-sm">
               {/* Table Header */}
-              <div className="grid grid-cols-12 px-6 py-3.5 bg-[#F4F4F5] dark:bg-[#18181B] border-b border-[#E4E4E7] dark:border-[#27272A] font-['Space_Grotesk'] text-[11px] text-[#71717A] uppercase tracking-wider">
+              <div className="hidden md:grid grid-cols-12 px-6 py-3.5 bg-[#F4F4F5] dark:bg-[#18181B] border-b border-[#E4E4E7] dark:border-[#27272A] font-['Space_Grotesk'] text-[11px] text-[#71717A] uppercase tracking-wider">
                 <div className="col-span-6">Product Details</div>
                 <div className="col-span-2 text-right">Unit Price</div>
                 <div className="col-span-2 text-center">Quantity</div>
@@ -77,7 +77,7 @@ export default function CartPage({ onNavigate }) {
               {/* Items List */}
               <div className="divide-y divide-[#E4E4E7] dark:divide-[#27272A]">
                 {cartItems.map((item, idx) => (
-                  <div key={idx} className="p-6 hover:bg-[#F4F4F5]/60 dark:hover:bg-[#18181B]/40 transition-colors">
+                  <div key={idx} className="p-4 sm:p-6 hover:bg-[#F4F4F5]/60 dark:hover:bg-[#18181B]/40 transition-colors">
                     <div className="grid grid-cols-12 gap-4 items-center">
                       {/* Product Details */}
                       <div className="col-span-12 md:col-span-6 flex gap-4 items-start">
@@ -173,7 +173,7 @@ export default function CartPage({ onNavigate }) {
           </div>
 
           {/* Right Column: Order Summary (4 of 12 cols, sticky) */}
-          <div className="lg:col-span-4 sticky top-28 flex flex-col gap-4">
+          <div className="lg:col-span-4 lg:sticky lg:top-28 flex flex-col gap-4">
             <div className="bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] rounded-xl p-6 shadow-md flex flex-col gap-5">
               <div className="flex items-center justify-between border-b border-[#E4E4E7] dark:border-[#27272A] pb-4">
                 <h2 className="font-['Space_Grotesk'] text-[18px] font-bold text-black dark:text-white">Order Summary</h2>

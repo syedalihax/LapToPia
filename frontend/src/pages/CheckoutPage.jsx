@@ -188,8 +188,8 @@ export default function CheckoutPage({ onNavigate }) {
     <div className="w-full bg-[#FAFAFA] dark:bg-[#09090B] text-[#09090B] dark:text-[#FAFAFA] min-h-screen py-8 transition-colors duration-200">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 flex flex-col gap-6">
         {/* Progress Pipeline */}
-        <div className="w-full bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] p-4 rounded-xl flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-3 font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-widest">
+        <div className="w-full bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] p-3 sm:p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 font-['Space_Grotesk'] text-[11px] sm:text-[12px] font-bold uppercase tracking-widest">
             <span className="text-[#71717A]">01 CART</span>
             <span className="text-[#D4D4D8] dark:text-[#3F3F46]">/</span>
             <span className="text-black dark:text-white">02 CHECKOUT & DISPATCH</span>

@@ -64,7 +64,7 @@ export default function HomePage({ onNavigate }) {
       {/* Hero Hardware Showcase Carousel */}
       <section className="relative w-full overflow-hidden bg-transparent">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 py-6">
-          <div className="relative w-full min-h-[500px] lg:min-h-[580px] rounded-2xl bg-[#09090B] text-white border border-[#E4E4E7] dark:border-[#27272A] overflow-hidden flex flex-col justify-end shadow-xl">
+          <div className="relative w-full min-h-[380px] sm:min-h-[460px] lg:min-h-[580px] rounded-2xl bg-[#09090B] text-white border border-[#E4E4E7] dark:border-[#27272A] overflow-hidden flex flex-col justify-end shadow-xl">
             {/* Background Image */}
             <div
               className="absolute inset-0 bg-cover bg-center transition-transform duration-700"
@@ -88,14 +88,14 @@ export default function HomePage({ onNavigate }) {
             {/* Arrow Controls */}
             <button
               onClick={() => setCurrentHeroSlide(prev => (prev === 0 ? heroSlides.length - 1 : prev - 1))}
-              className="absolute top-1/2 -translate-y-1/2 left-4 z-20 w-10 h-10 rounded-full bg-[#18181B]/80 hover:bg-white hover:text-black text-white flex items-center justify-center transition-colors border border-[#3F3F46] cursor-pointer"
+              className="absolute top-1/2 -translate-y-1/2 left-2 sm:left-4 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#18181B]/80 hover:bg-white hover:text-black text-white flex items-center justify-center transition-colors border border-[#3F3F46] cursor-pointer"
               title="Previous"
             >
               <Icon className="text-[20px]">chevron_left</Icon>
             </button>
             <button
               onClick={() => setCurrentHeroSlide(prev => (prev === heroSlides.length - 1 ? 0 : prev + 1))}
-              className="absolute top-1/2 -translate-y-1/2 right-4 z-20 w-10 h-10 rounded-full bg-[#18181B]/80 hover:bg-white hover:text-black text-white flex items-center justify-center transition-colors border border-[#3F3F46] cursor-pointer"
+              className="absolute top-1/2 -translate-y-1/2 right-2 sm:right-4 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#18181B]/80 hover:bg-white hover:text-black text-white flex items-center justify-center transition-colors border border-[#3F3F46] cursor-pointer"
               title="Next"
             >
               <Icon className="text-[20px]">chevron_right</Icon>
@@ -113,7 +113,7 @@ export default function HomePage({ onNavigate }) {
                 </span>
               </div>
 
-              <h1 className="font-['Space_Grotesk'] text-[32px] sm:text-[46px] lg:text-[56px] text-white uppercase tracking-tight font-bold leading-none">
+              <h1 className="font-['Space_Grotesk'] text-[26px] sm:text-[46px] lg:text-[56px] text-white uppercase tracking-tight font-bold leading-[1.05]">
                 {heroSlides[currentHeroSlide].title}
               </h1>
 
@@ -156,7 +156,7 @@ export default function HomePage({ onNavigate }) {
       </section>
 
       {/* System Category Grid */}
-      <section className="w-full py-16 bg-transparent">
+      <section className="w-full py-10 sm:py-16 bg-transparent">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 flex flex-col gap-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
@@ -177,12 +177,12 @@ export default function HomePage({ onNavigate }) {
               No categories are configured yet. Add categories from the admin panel to show them here.
             </p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {categories.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => onNavigate && onNavigate('catalog', { category: cat.filter })}
-                  className="group relative h-72 rounded-xl bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] overflow-hidden flex flex-col justify-end p-6 text-left transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl cursor-pointer"
+                  className="group relative h-56 sm:h-72 rounded-xl bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] overflow-hidden flex flex-col justify-end p-5 sm:p-6 text-left transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl cursor-pointer"
                 >
                   {cat.image ? (
                     <>
@@ -220,7 +220,7 @@ export default function HomePage({ onNavigate }) {
       </section>
 
       {/* Live Catalog Drops Section */}
-      <section className="w-full py-16 bg-[#F4F4F5] dark:bg-[#121215] border-y border-[#E4E4E7] dark:border-[#27272A] transition-colors">
+      <section className="w-full py-10 sm:py-16 bg-[#F4F4F5] dark:bg-[#121215] border-y border-[#E4E4E7] dark:border-[#27272A] transition-colors">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 flex flex-col gap-10">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
@@ -268,7 +268,7 @@ export default function HomePage({ onNavigate }) {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {(activeTab === 'all'
                 ? featuredProducts
                 : featuredProducts.filter(p => p.category?.toLowerCase() === activeTab.toLowerCase())
@@ -281,7 +281,7 @@ export default function HomePage({ onNavigate }) {
                     {/* Media Preview */}
                     <div
                       onClick={() => onNavigate && onNavigate('product-detail', { id: product.id })}
-                      className="relative w-full h-52 rounded-lg bg-[#F4F4F5] dark:bg-[#18181B] overflow-hidden flex items-center justify-center p-4 cursor-pointer"
+                      className="relative w-full h-32 sm:h-52 rounded-lg bg-[#F4F4F5] dark:bg-[#18181B] overflow-hidden flex items-center justify-center p-3 sm:p-4 cursor-pointer"
                     >
                       <img
                         src={Array.isArray(product.images) && product.images[0] ? product.images[0] : ''}

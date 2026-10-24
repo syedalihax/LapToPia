@@ -21,6 +21,7 @@ export default function CatalogPage({ initialCategory = '', initialSubcategory =
   const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState('grid');
   const [pricePreset, setPricePreset] = useState('all');
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -122,7 +123,7 @@ export default function CatalogPage({ initialCategory = '', initialSubcategory =
               <span className="font-['JetBrains_Mono'] text-[11px] text-black dark:text-[#FAFAFA] bg-[#F4F4F5] dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] px-2.5 py-0.5 rounded uppercase tracking-widest font-semibold w-max">
                 SAMPLE PKR PRICES · DEMO CATALOG
               </span>
-              <h1 className="font-['Space_Grotesk'] text-[32px] md:text-[40px] text-black dark:text-white font-bold uppercase tracking-tight leading-none">
+              <h1 className="font-['Space_Grotesk'] text-[24px] sm:text-[32px] md:text-[40px] text-black dark:text-white font-bold uppercase tracking-tight leading-none">
                 {selectedCategory === 'all' ? 'SHOP COMPUTERS & COMPONENTS' : selectedCategoryName}
               </h1>
               <p className="font-['Inter'] text-[13px] text-[#71717A] max-w-2xl leading-relaxed">
@@ -163,9 +164,20 @@ export default function CatalogPage({ initialCategory = '', initialSubcategory =
       </section>
 
       {/* 3. 2-Column Main Catalog Architecture */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
-        {/* LEFT SIDEBAR FILTERS (Sticky Facet Panel) */}
-        <aside className="lg:col-span-3 w-full flex flex-col gap-6 sticky top-24 bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] rounded-xl p-5 shadow-sm">
+      <div className="max-w-[1440px] mx-auto px-3 sm:px-8 lg:px-12 py-5 sm:py-8 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start w-full">
+        <div className="lg:hidden">
+          <button
+            type="button"
+            onClick={() => setFiltersOpen(open => !open)}
+            className="w-full flex items-center justify-between rounded-xl border border-[#E4E4E7] bg-white px-4 py-3 text-left dark:border-[#27272A] dark:bg-[#121215]"
+          >
+            <span className="font-['Space_Grotesk'] text-[12px] font-bold uppercase tracking-wider text-black dark:text-white">Filters</span>
+            <Icon className="text-[20px]">{filtersOpen ? 'expand_less' : 'tune'}</Icon>
+          </button>
+        </div>
+
+        {/* LEFT SIDEBAR FILTERS */}
+        <aside className={`${filtersOpen ? 'flex' : 'hidden'} lg:flex lg:col-span-3 w-full flex-col gap-6 lg:sticky lg:top-24 bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] rounded-xl p-5 shadow-sm`}>
           {/* Search within facet */}
           <div className="flex flex-col gap-2">
             <span className="font-['Space_Grotesk'] text-[11px] font-bold uppercase tracking-wider text-black dark:text-white">
@@ -364,20 +376,20 @@ export default function CatalogPage({ initialCategory = '', initialSubcategory =
               </button>
             </div>
           ) : (
-            <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5' : 'flex flex-col gap-4'}>
+            <div className={viewMode === 'grid' ? 'grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5' : 'flex flex-col gap-4'}>
               {products.map(product => (
                 <div
                   key={product.id}
                   className={`group bg-white dark:bg-[#121215] border border-[#E4E4E7] dark:border-[#27272A] hover:border-black dark:hover:border-[#3F3F46] rounded-xl overflow-hidden flex shadow-sm hover:shadow-md transition-all ${
-                    viewMode === 'grid' ? 'flex-col justify-between' : 'flex-row items-center p-4 gap-6'
+                    viewMode === 'grid' ? 'flex-col justify-between' : 'flex-col sm:flex-row sm:items-center p-3 sm:p-4 gap-4 sm:gap-6'
                   }`}
                 >
-                  <div className={viewMode === 'grid' ? 'flex flex-col' : 'flex items-center gap-6 flex-1'}>
+                  <div className={viewMode === 'grid' ? 'flex flex-col min-w-0' : 'flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 flex-1 min-w-0'}>
                     {/* Media Container */}
                     <div
                       onClick={() => onNavigate && onNavigate('product-detail', { id: product.id })}
-                      className={`relative bg-[#F4F4F5] dark:bg-[#18181B] flex items-center justify-center p-4 cursor-pointer overflow-hidden ${
-                        viewMode === 'grid' ? 'w-full h-56' : 'w-36 h-36 rounded-lg shrink-0'
+                      className={`relative bg-[#F4F4F5] dark:bg-[#18181B] flex items-center justify-center p-3 sm:p-4 cursor-pointer overflow-hidden ${
+                        viewMode === 'grid' ? 'w-full h-36 sm:h-56' : 'w-full h-40 sm:w-36 sm:h-36 rounded-lg shrink-0'
                       }`}
                     >
                       <img
@@ -392,20 +404,20 @@ export default function CatalogPage({ initialCategory = '', initialSubcategory =
                     </div>
 
                     {/* Details */}
-                    <div className="p-4 flex flex-col gap-2.5 flex-1">
-                      <span className="font-['JetBrains_Mono'] text-[10px] text-[#71717A] uppercase tracking-wider">
+                    <div className="p-3 sm:p-4 flex flex-col gap-2.5 flex-1 min-w-0">
+                      <span className="font-['JetBrains_Mono'] text-[10px] text-[#71717A] uppercase tracking-wider line-clamp-1">
                         {product.brand || product.category} • {product.subcategory || product.category} • SKU: {product.sku}
                       </span>
                       <h3
                         onClick={() => onNavigate && onNavigate('product-detail', { id: product.id })}
-                        className="font-['Space_Grotesk'] text-[16px] text-black dark:text-white font-bold line-clamp-1 hover:underline cursor-pointer"
+                        className="font-['Space_Grotesk'] text-[13px] sm:text-[16px] text-black dark:text-white font-bold line-clamp-2 sm:line-clamp-1 hover:underline cursor-pointer"
                       >
                         {product.title}
                       </h3>
                       {product.description && <p className="line-clamp-2 text-[11px] leading-relaxed text-[#71717A]">{product.description}</p>}
 
                       {/* Specs */}
-                      <div className="flex flex-wrap gap-1 font-['JetBrains_Mono'] text-[10px] text-[#71717A]">
+                      <div className="hidden sm:flex flex-wrap gap-1 font-['JetBrains_Mono'] text-[10px] text-[#71717A]">
                         {product.specs?.slice(0, 4).map((spec, i) => (
                           <span key={i} className="px-1.5 py-0.5 bg-[#F4F4F5] dark:bg-[#18181B] border border-[#E4E4E7] dark:border-[#27272A] rounded">
                             {spec.value || spec}
@@ -415,7 +427,7 @@ export default function CatalogPage({ initialCategory = '', initialSubcategory =
 
                       {/* Price */}
                       <div className="pt-1 flex items-baseline justify-between">
-                        <span className="font-['Space_Grotesk'] text-[18px] text-black dark:text-white font-bold">
+                        <span className="font-['Space_Grotesk'] text-[14px] sm:text-[18px] text-black dark:text-white font-bold">
                           Rs. {Number(product.pricePKR).toLocaleString()}
                         </span>
                         <span className="font-['JetBrains_Mono'] text-[11px] text-[#71717A]">
@@ -426,7 +438,7 @@ export default function CatalogPage({ initialCategory = '', initialSubcategory =
                   </div>
 
                   {/* Actions */}
-                  <div className={viewMode === 'grid' ? 'p-4 pt-0' : 'shrink-0'}>
+                  <div className={viewMode === 'grid' ? 'p-3 sm:p-4 pt-0' : 'shrink-0 px-3 pb-3 sm:p-0'}>
                     <button
                       disabled={product.stockQuantity <= 0}
                       onClick={() => addToCart(product, 1)}

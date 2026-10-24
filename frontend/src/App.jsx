@@ -63,7 +63,7 @@ function StorefrontLayout({ onNavigate, currentPath }) {
   return (
     <>
       <Navbar currentPath={currentPath} onNavigate={onNavigate} />
-      <main className="flex-1 w-full pt-20">
+      <main className="flex-1 w-full pt-16 sm:pt-20">
         <Outlet />
       </main>
       <Footer onNavigate={onNavigate} />

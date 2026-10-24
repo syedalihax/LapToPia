@@ -8,6 +8,21 @@
     background-color: #FAFAFA;
     color: #09090B;
     font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  #root {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 
   html.dark, html.dark body {
